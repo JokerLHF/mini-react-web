@@ -1,7 +1,8 @@
+import { FunctionComponent } from "../react-reconciler/interface/fiber";
 import { REACT_ELEMENT_TYPE } from "../shared/ReactSymbols";
 
-// 先只支持 div p 这种标签类型
-export type ReactNodeType = string; 
+// 只支持标签类型 以及 函数组件(直接忽略类组件)
+export type ReactNodeType = string | FunctionComponent; 
 export type ReactNodeKey = string | null;
 export type ReactNodeProps = { [key: string]: any };
 

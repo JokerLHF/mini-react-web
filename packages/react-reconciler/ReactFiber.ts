@@ -1,12 +1,12 @@
 import { ReactNode, ReactNodeKey, ReactNodeProps } from "../react/interface";
-import { ReactFiberMemoizedState, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface";
+import { ReactFiberMemoizedState, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
 
 export class FiberNode {
   tag: ReactFiberTag;
   key: ReactNodeKey;
   pendingProps: ReactNodeProps;
-  type: ReactFiberType | null;
-  stateNode: ReactFiberStateNode | null;
+  type: ReactFiberType;
+  stateNode: ReactFiberStateNode;
 
   return: FiberNode | null;
   child: FiberNode | null;
@@ -15,6 +15,7 @@ export class FiberNode {
 
   memoizedState: ReactFiberMemoizedState;
   updateQueue: ReactFiberUpdateQueue | null;
+  effectTag: ReactFiberSideEffectTags;
 
   constructor(tag: ReactFiberTag, pendingProps: ReactNodeProps = {}, key: ReactNodeKey = null) {
 
@@ -44,6 +45,7 @@ export class FiberNode {
      */
     this.memoizedState = null;
     this.updateQueue = null;
+    this.effectTag = ReactFiberSideEffectTags.NoEffect;
   }
 }
 
@@ -71,7 +73,8 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: ReactNode
 
 export const createFiberFromElement = (element: ReactNode) => {
   const { type, key, props } = element;
-  const fiber = new FiberNode(ReactFiberTag.HostComponent, props, key);
+  const tag = typeof type === 'function' ? ReactFiberTag.FunctionComponent : ReactFiberTag.HostComponent;
+  const fiber = new FiberNode(tag, props, key);
   fiber.type = type;
   return fiber;
 }

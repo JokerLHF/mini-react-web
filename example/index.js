@@ -1,13 +1,16 @@
 import { React, ReactDOM } from '../packages';
 
-const Block = (
-  <div>
-    <p>I am</p>
-    <p>hongfeng</p>
-    true
-    undefined
-    null
-  </div>
-);
+function App() {
+  return (
+    <div>
+      <p>I am</p>
+      <p>hongfeng</p>
+      true
+      undefined
+      null
+      <span></span>
+    </div>
+  )
+}
 
-ReactDOM.render(Block, document.querySelector('#root'))
+ReactDOM.render(<App />, document.querySelector('#root'))

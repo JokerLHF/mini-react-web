@@ -1,5 +1,5 @@
 import { createInstance, createTextInstance } from "../shared/utils";
-import { ReactFiberTag } from "./interface";
+import { ReactFiberTag } from "./interface/fiber";
 import { FiberNode } from "./ReactFiber";
 
 /**
@@ -48,7 +48,7 @@ export const appendAllChildren = (parent: HTMLElement, workInProgress: FiberNode
 /**
  * 进入这里 unitOfWork 肯定是某个子树的叶子节点
  * 这个函数作用是：
- *  1. 根据 fiber 类型创建 dom
+ *  1. 根据 fiber tag 类型创建 dom 节点
  *  1. 返回节点的兄弟节点（如果存在），继续走 beginWork，有可能兄弟节点还存在子节点，需要继续为子节点创建 fiber 节点 
  *  2. 不存在兄弟节点递归父节点，为父节点创建 dom
  */
@@ -65,10 +65,9 @@ export const completeUnitOfWork = (unitOfWork: FiberNode) => {
     if (sibling) {
       return sibling;
     }
-    
+
     // 兄弟节点也处理完后，向上一级继续处理。为父节点创建 dom 节点
     completedWork = completedWork.return;
-
   } while(completedWork);
 
   return null;
@@ -79,14 +78,15 @@ export const completeUnitOfWork = (unitOfWork: FiberNode) => {
  */
 export const completeWork = (current: FiberNode | null, workInProgress: FiberNode) => {
   switch (workInProgress.tag) {
-    case ReactFiberTag.HostRoot:
-      break;
     case ReactFiberTag.HostComponent:
       const instance = workInProgress.stateNode = createInstance(workInProgress.type as string);
       appendAllChildren(instance, workInProgress);
       break;
     case ReactFiberTag.HostText:
       workInProgress.stateNode = createTextInstance(workInProgress.pendingProps._reactTextContent);
+      break;
+    case ReactFiberTag.HostRoot:
+    case ReactFiberTag.FunctionComponent:
       break;
     default:
       break;

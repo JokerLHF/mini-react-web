@@ -24,7 +24,7 @@ const ReactElement = (type: ReactNodeType, key: ReactNodeKey, props: ReactNodePr
 export const createElement = (type: ReactNodeType, config: ReactNodeProps, ...children:  ReactNodeChildren[]) => {
   const props: ReactNodeProps = config || {};
   const length = children.length;
-  // 多个children使用数组的形式
+  // 多个children使用数组的形式, 没有 children 就没有 children 字段
   if (length === 1) {
     props.children = children[0];
   } else if (length > 1) {

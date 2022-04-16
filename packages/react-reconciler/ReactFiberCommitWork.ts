@@ -8,7 +8,8 @@ export const commitRoot = (root: FiberNode) => {
     return;
   }
   const rootContainer = (alternate.stateNode as ReactRoot).container;
-  const dom = alternate.child?.stateNode;
+  const dom = alternate.child?.child?.stateNode;
+
   if (!dom) {
     throw new Error('程序出错')
   }

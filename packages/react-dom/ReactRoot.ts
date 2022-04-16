@@ -1,5 +1,5 @@
 import { Container } from ".";
-import { ReactFiberTag } from "../react-reconciler/interface";
+import { ReactFiberTag } from "../react-reconciler/interface/fiber";
 import { FiberNode } from "../react-reconciler/ReactFiber"
 import { scheduleUpdateOnFiber } from "../react-reconciler/ReactFiberWorkLoop";
 import { createUpdate, enqueueUpdate, initializeUpdateQueue } from "../react-reconciler/ReactUpdateQueue";
@@ -27,6 +27,6 @@ export class ReactRoot {
 
     enqueueUpdate(this.current, update);
 
-    scheduleUpdateOnFiber(this.current, expirationTime);
+    scheduleUpdateOnFiber(this.current);
   }
 }

@@ -1,4 +1,4 @@
-import { ReactFiberTag } from "./interface";
+import { ReactFiberTag } from "./interface/fiber";
 import { createWorkInProgress, FiberNode } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
 import { commitRoot } from "./ReactFiberCommitWork";
@@ -25,7 +25,7 @@ const markUpdateTimeFromFiberToRoot = (fiber: FiberNode): FiberNode => {
   return rootFiber as FiberNode;
 }
 
-const prepareFreshStack = (rootFiber: FiberNode, expirationTime: number) => {
+const prepareFreshStack = (rootFiber: FiberNode) => {
   workInProgress = createWorkInProgress(rootFiber, {});
 }
 
@@ -52,9 +52,9 @@ const performUnitOfWork = (unitOfWork: FiberNode) => {
   return next;
 }
 
-export const scheduleUpdateOnFiber = (fiber: FiberNode, expirationTime: number) => {
+export const scheduleUpdateOnFiber = (fiber: FiberNode) => {
   const root = markUpdateTimeFromFiberToRoot(fiber);
-  prepareFreshStack(root, expirationTime);
+  prepareFreshStack(root);
   performSyncWorkOnRoot(root);
 }
 

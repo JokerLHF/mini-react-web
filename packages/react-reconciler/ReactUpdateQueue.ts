@@ -1,5 +1,5 @@
 import { ReactNodeProps } from "../react/interface";
-import { ReactFiberMemoizedState, ReactFiberTag, ReactFiberUpdate, ReactFiberUpdateQueue, ReactFiberUpdateTag } from "./interface";
+import { ReactFiberMemoizedState, ReactFiberTag, ReactFiberUpdate, ReactFiberUpdateQueue, ReactFiberUpdateTag } from "./interface/fiber";
 import { FiberNode } from "./ReactFiber";
 
 export const createUpdate = (expirationTime: number): ReactFiberUpdate => {
