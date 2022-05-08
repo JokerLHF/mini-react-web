@@ -1,8 +1,15 @@
+/**
+ * const [state, updateState] = useState(1);
+ * updateState(1);  action 就是1
+ * updateState(state => state + 1); action 就是 state => state + 1
+ */
+export type BasicStateAction<S> = (state: S) => S | S
+
 export type Dispatch<A> = (newState: A) => void;
 
 export type Dispatcher = {
   // initialState 就不支持函数了，
-  useState<S>(initialState: S): [S, Dispatch<S>],
+  useState<S>(initialState: S): [S, Dispatch<BasicStateAction<S>>],
 }
 
 /**
@@ -20,8 +27,9 @@ export interface Update<A> {
   next: Update<A> | null,
 }
 
-export interface UpdateQueue<S> {
-  pending: Update<S> | null, // 环形链表
+export interface UpdateQueue<A> {
+  pending: Update<A> | null, // 环形链表
+  dispatch: Dispatch<A> | null,
 }
 
 export type Hook = {
@@ -29,3 +37,7 @@ export type Hook = {
   queue: UpdateQueue<any> | null, // 修改hook会产生update， 
   next: Hook | null,
 };
+
+export interface ReactHookReducer<S> {
+  (state: S, action: BasicStateAction<S>): S
+}

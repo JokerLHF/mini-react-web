@@ -1,5 +1,4 @@
-import { ReactNodeProps } from "../react/interface";
-import { ReactFiberMemoizedState, ReactFiberTag, ReactFiberUpdate, ReactFiberUpdateQueue, ReactFiberUpdateTag } from "./interface/fiber";
+import { ReactFiberHostRootUpdateQueue, ReactFiberMemoizedState, ReactFiberUpdate, ReactFiberUpdateQueue, ReactFiberUpdateTag } from "./interface/fiber";
 import { FiberNode } from "./ReactFiber";
 
 export const createUpdate = (expirationTime: number): ReactFiberUpdate => {
@@ -55,7 +54,7 @@ const getStateFromUpdate = (update: ReactFiberUpdate, prevState: ReactFiberMemoi
  * shared.pending.next 为 firstPendingUpdate
  */
 export const enqueueUpdate = (fiber: FiberNode, update: ReactFiberUpdate) => {
-  const updateQueue = fiber.updateQueue;
+  const updateQueue = fiber.updateQueue as ReactFiberHostRootUpdateQueue;
   // TODO: fiber已经unmount
   if (!updateQueue) {
     return;
@@ -79,7 +78,7 @@ export const enqueueUpdate = (fiber: FiberNode, update: ReactFiberUpdate) => {
  * 最新的 state 在 queue.baseState 和 workInProgress.memoizedState 上面
  */
 export const processUpdateQueue = (workInProgress: FiberNode) => {
-  const queue = workInProgress.updateQueue as ReactFiberUpdateQueue;
+  const queue = workInProgress.updateQueue as ReactFiberHostRootUpdateQueue;
   // base update 为 单向非环链表
   let firstBaseUpdate = null;
 

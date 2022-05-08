@@ -1,7 +1,7 @@
 import { ReactNode } from "../react/interface";
 import { ReactRoot } from "./ReactRoot";
 
-export type Container = Element;
+export type Container = HTMLElement;
 
 const ReactDOM = {
   render(element: ReactNode, container: Container) {

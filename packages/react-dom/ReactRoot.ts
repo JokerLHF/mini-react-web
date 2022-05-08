@@ -7,11 +7,13 @@ import { ReactNode } from "../react/interface"
 
 export class ReactRoot {
   current: FiberNode;
-  container: Element;
+  containerInfo: HTMLElement;
 
   constructor(container: Container) {
     this.current = new FiberNode(ReactFiberTag.HostRoot);
-    this.container = container;
+    // 应用挂载的根DOM节点
+    this.containerInfo = container;
+    // RootFiber指向FiberRoot
     this.current.stateNode = this;
 
     initializeUpdateQueue(this.current);

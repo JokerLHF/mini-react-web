@@ -1,4 +1,4 @@
-import { ReactFiberTag } from "./interface/fiber";
+import { FiberRoot, ReactFiberTag } from "./interface/fiber";
 import { createWorkInProgress, FiberNode } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
 import { commitRoot } from "./ReactFiberCommitWork";
@@ -6,26 +6,27 @@ import { completeUnitOfWork } from "./ReactFiberCompleteWork";
 
 let workInProgress: FiberNode | null = null;
 
-// 从 fiber 向上直到 RootFiber
-const markUpdateTimeFromFiberToRoot = (fiber: FiberNode): FiberNode => {
-  let rootFiber;
+// 从 fiber 向上直到 FiberRoot
+const markUpdateTimeFromFiberToRoot = (fiber: FiberNode) => {
+  let rootFiber = null;
   let node = fiber.return;
 
   if (!node && fiber.tag === ReactFiberTag.HostRoot) {
-    rootFiber = fiber;
+    rootFiber = fiber as FiberRoot;
   } else {
     while (node) {
       if (!node.return && node.tag === ReactFiberTag.HostRoot) {
-        rootFiber = node;
+        rootFiber = node as FiberRoot;
         break;
       }
       node = node.return;
     }
   }
-  return rootFiber as FiberNode;
+
+  return rootFiber;
 }
 
-const prepareFreshStack = (rootFiber: FiberNode) => {
+const prepareFreshStack = (rootFiber: FiberRoot) => {
   workInProgress = createWorkInProgress(rootFiber, {});
 }
 
@@ -35,9 +36,10 @@ const workLoopSync = () => {
   }
 }
 
-const performSyncWorkOnRoot = (root: FiberNode) => {
+const performSyncWorkOnRoot = (root: FiberRoot) => {
+  // render 阶段
   workLoopSync();
-  // render阶段结束，进入commit阶段
+  // commit 阶段
   commitRoot(root);
 }
 
@@ -54,7 +56,9 @@ const performUnitOfWork = (unitOfWork: FiberNode) => {
 
 export const scheduleUpdateOnFiber = (fiber: FiberNode) => {
   const root = markUpdateTimeFromFiberToRoot(fiber);
-  prepareFreshStack(root);
-  performSyncWorkOnRoot(root);
+  if (root !== null) {
+    prepareFreshStack(root);
+    performSyncWorkOnRoot(root);
+  }
 }
 

@@ -1,17 +1,17 @@
-import { ReactNode, ReactNodeChildren } from "../react/interface";
+import { ReactNodeChildren } from "../react/interface";
 import { FunctionComponent, ReactFiberTag } from "./interface/fiber";
 import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
 import { FiberNode } from "./ReactFiber";
 import { renderWithHooks } from "./ReactFiberHook";
 import { processUpdateQueue } from "./ReactUpdateQueue";
 
-
 const reconcileChildren = (current: FiberNode | null, workInProgress: FiberNode, nextChildren: ReactNodeChildren) => {
-  // 首次渲染时只有 root 节点存在 current
+  // mount 阶段只有 root 节点存在 current
+  // update 阶段就要看是否存在子节点
   if (current) {
-    workInProgress.child = reconcileChildFibers(workInProgress, nextChildren);
+    workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren);
   } else {
-    workInProgress.child = mountChildFibers(workInProgress, nextChildren);
+    workInProgress.child = mountChildFibers(workInProgress, null, nextChildren);
   }
 }
 
@@ -20,6 +20,15 @@ const updateHostRoot = (current: FiberNode, workInProgress: FiberNode) => {
 
   const nextState = workInProgress.memoizedState as Record<string, any>;
   const nextChildren = nextState.element;
+
+  const prevState = current.memoizedState;
+  const prevChildren = prevState ? (prevState as Record<string, any>).element : null;
+  /**
+   * TODO：这是一条优化路径
+   */
+  if (prevChildren === nextChildren) {
+    // 当前root state未变化，走优化路径，不需要协调子节点
+  }
 
   reconcileChildren(current, workInProgress, nextChildren);
   return workInProgress.child;
@@ -51,6 +60,11 @@ const updateFunctionComponent = (current: FiberNode | null, workInProgress: Fibe
  * beginWork 的任务就是将 workInprogress 的子节点变为 fiber 节点。
  */
 export const beginWork = (current: FiberNode | null, workInProgress: FiberNode): FiberNode | null => {
+  // update时，可以复用current（即上一次更新的Fiber节点）
+  if (current) {
+    // TODO：优化路径
+  }
+  // mount时：根据tag不同，创建不同的子Fiber节点
   switch (workInProgress.tag) {
     case ReactFiberTag.HostRoot:
       // hostRoot 的 current 肯定存在

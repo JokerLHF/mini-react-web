@@ -13,5 +13,5 @@ export interface ReactNode {
   props: ReactNodeProps,
 }
 
-export type ReactNodeChildren = ReactNodeChild | ReactNodeChild[];
 export type ReactNodeChild = string | ReactNode;
+export type ReactNodeChildren = ReactNodeChild | ReactNodeChild[];

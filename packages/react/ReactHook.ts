@@ -8,6 +8,9 @@ interface IDispatcher {
   current: Dispatcher | null,
 };
 
-const ReactCurrentDispatcher: IDispatcher = { current: null };
+export const ReactCurrentDispatcher: IDispatcher = { current: null };
 
-export default ReactCurrentDispatcher;
+export const useState = <S>(initialState: S) => {
+  return ReactCurrentDispatcher.current!.useState(initialState);
+}
+

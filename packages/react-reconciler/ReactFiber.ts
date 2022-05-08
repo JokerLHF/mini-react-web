@@ -15,7 +15,12 @@ export class FiberNode {
 
   memoizedState: ReactFiberMemoizedState;
   updateQueue: ReactFiberUpdateQueue | null;
+
   effectTag: ReactFiberSideEffectTags;
+  firstEffect: FiberNode | null;
+  lastEffect: FiberNode | null;
+  nextEffect: FiberNode | null;
+  index: number;
 
   constructor(tag: ReactFiberTag, pendingProps: ReactNodeProps = {}, key: ReactNodeKey = null) {
 
@@ -24,9 +29,12 @@ export class FiberNode {
      */
     this.tag = tag;
     this.pendingProps = pendingProps;
-    this.key = key;
     this.type = null;
     this.stateNode = null;
+
+    // diff 默认使用用户定义的 key, 没有使用 index
+    this.index = 0;
+    this.key = key;
 
     /**
      *  用于连接其他Fiber节点形成Fiber树
@@ -46,28 +54,61 @@ export class FiberNode {
     this.memoizedState = null;
     this.updateQueue = null;
     this.effectTag = ReactFiberSideEffectTags.NoEffect;
+
+    // 以下3个变量组成了当前Fiber上保存的effect list
+    this.firstEffect = null;
+    this.lastEffect = null;
+    this.nextEffect = null;
   }
 }
 
+export const cloneChildFibers = (workInProgress: FiberNode) => {
+  let currentChild = workInProgress.child;
+  if (!currentChild) {
+    return;
+  }
+
+  // clone 第一个 child
+  let newChild = createWorkInProgress(currentChild, currentChild.pendingProps);
+  workInProgress.child = newChild;
+  newChild.return = workInProgress;
+
+  // 遍历 clone 兄弟节点
+  while(currentChild.sibling) {
+    currentChild = currentChild.sibling;
+    newChild = newChild.sibling = createWorkInProgress(currentChild, currentChild.pendingProps);
+    newChild.return = workInProgress;
+  }
+
+  // TODO：这个是干什么用的？  newChild.sibling = null;
+}
+
+
+// 为 current fiber 创建对应的 alternate fiber
 export const createWorkInProgress = (current: FiberNode, pendingProps: ReactNodeProps) => {
   let workInProgress = current.alternate;
 
-  // mount 阶段，return child sibling 这些关系在 reconcileChildFibers 会确定
   if (!workInProgress) {
     workInProgress = new FiberNode(current.tag, pendingProps, current.key);
-
-    workInProgress.updateQueue = current.updateQueue;
-    workInProgress.memoizedState = current.memoizedState;
+    workInProgress.type = current.type;
+    workInProgress.stateNode = current.stateNode;
 
     current.alternate = workInProgress;
     workInProgress.alternate = current;
-
-    workInProgress.stateNode = current.stateNode;
   } else {
-    // update 阶段
-
+    // reactRoot 此时就存在 workInprogress。所以还是需要对 child sibling 赋值
+    workInProgress.pendingProps = pendingProps;
+    // 已有alternate的情况重置effect
+    workInProgress.effectTag = ReactFiberSideEffectTags.NoEffect;
+    workInProgress.firstEffect = null;
+    workInProgress.lastEffect = null;
+    workInProgress.nextEffect = null;
   }
 
+  workInProgress.child = current.child;
+  workInProgress.sibling = current.sibling;
+  workInProgress.updateQueue = current.updateQueue;
+  workInProgress.memoizedState = current.memoizedState;
   return workInProgress;
 }
 
@@ -80,7 +121,10 @@ export const createFiberFromElement = (element: ReactNode) => {
 }
 
 export const createFiberFromText = (textContent: string) => {
-  // TODO: 这里为了保持 props 都是对象，textContent 包裹在 props 里
+  /**
+   * TIPS: 这里为了保持 props 都是对象，比较容易处理，所以 textContent 包裹在 props 里
+   * 但是 React 不是，ReactFiber props 可能是对象也有可能是文本字符串。（感觉react的处理增加了复杂度🤔🤔🤔）
+   */
   const fiber = new FiberNode(ReactFiberTag.HostText, { _reactTextContent: textContent });
   return fiber;
 }

@@ -1,5 +1,6 @@
 import { ReactRoot } from "../../react-dom/ReactRoot";
 import { ReactNode, ReactNodeProps } from "../../react/interface";
+import { FiberNode } from "../ReactFiber";
 import { Hook } from "./hook";
 
 export enum ReactFiberTag {
@@ -36,8 +37,7 @@ export type ReactFiberType = string | FunctionComponent | null;
  * 1. 对于 HostComponent 指真实的 DOM节点
  * 2. 对于 HostText 来说就是 Text节点
  * 3. 对于 RootFiber 来说就是 ReactRoot 这个类本身
- * 4. 对于 FunctionComponent 来说是 xxx
- * 5. 其他情况都是 null
+ * 4. 其他情况都是 null
  */
 export type ReactFiberStateNode = HTMLElement | Text | ReactRoot | null;
 
@@ -56,14 +56,29 @@ export interface ReactFiberUpdate {
   next: ReactFiberUpdate | null,
 }
 
-export interface ReactFiberUpdateQueue {
+export type ReactFiberHostComponentUpdateQueue = any[];
+export interface ReactFiberHostRootUpdateQueue {
   baseState: ReactFiberMemoizedState,
   shared: {
     pending: ReactFiberUpdate | null,
   },
 }
+/**
+ * 1. 对于 HostComponent 指的的 props 的 diff, 结构如下： ['className', 'test', 'style', { color: 'red' } ]
+ * 2. 对于 HostRoot 或者 ClassComponent(不支持) 来说就是 ReactFiberHostRootUpdateQueue 结构
+ * 3. 对于 FunctionComponent 有自己的  hook update 结构，在 hook.ts 中定义
+ */
+export type ReactFiberUpdateQueue = ReactFiberHostComponentUpdateQueue | ReactFiberHostRootUpdateQueue;
+
 
 export enum ReactFiberSideEffectTags {
   NoEffect = 0b00000000000,
   Placement = 0b00000000010,
+  Update = 0b00000000100,
+  Delete = 0b00000001000,
 }
+
+export type FiberRoot = FiberNode & {
+  tag: ReactFiberTag.HostRoot,
+  stateNode: ReactRoot,
+};
