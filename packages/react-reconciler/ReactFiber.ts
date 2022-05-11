@@ -14,7 +14,7 @@ export class FiberNode {
   alternate: FiberNode | null;
 
   memoizedState: ReactFiberMemoizedState;
-  updateQueue: ReactFiberUpdateQueue | null;
+  updateQueue: ReactFiberUpdateQueue;
 
   effectTag: ReactFiberSideEffectTags;
   firstEffect: FiberNode | null;

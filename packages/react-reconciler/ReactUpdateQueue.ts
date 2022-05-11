@@ -1,4 +1,4 @@
-import { ReactFiberHostRootUpdateQueue, ReactFiberMemoizedState, ReactFiberUpdate, ReactFiberUpdateQueue, ReactFiberUpdateTag } from "./interface/fiber";
+import { ReactFiberHostRootUpdateQueue, ReactFiberMemoizedState, ReactFiberUpdate, ReactFiberUpdateTag } from "./interface/fiber";
 import { FiberNode } from "./ReactFiber";
 
 export const createUpdate = (expirationTime: number): ReactFiberUpdate => {

@@ -1,7 +1,7 @@
 import { ReactRoot } from "../../react-dom/ReactRoot";
 import { ReactNode, ReactNodeProps } from "../../react/interface";
 import { FiberNode } from "../ReactFiber";
-import { Hook } from "./hook";
+import { Hook, ReactHookEffect } from "./hook";
 
 export enum ReactFiberTag {
   // reactRoot
@@ -63,19 +63,26 @@ export interface ReactFiberHostRootUpdateQueue {
     pending: ReactFiberUpdate | null,
   },
 }
+export interface ReactFiberFunctionComponentUpdateQueue {
+  lastEffect: ReactHookEffect | null,
+}
+
 /**
  * 1. 对于 HostComponent 指的的 props 的 diff, 结构如下： ['className', 'test', 'style', { color: 'red' } ]
- * 2. 对于 HostRoot 或者 ClassComponent(不支持) 来说就是 ReactFiberHostRootUpdateQueue 结构
- * 3. 对于 FunctionComponent 有自己的  hook update 结构，在 hook.ts 中定义
+ * 2. 对于 HostRoot 来说就是 ReactFiberHostRootUpdateQueue 结构
+ * 3. 对于 FunctionComponent 来说就是 ReactFiberFunctionComponentUpdateQueue，主要存储 useEffect 信息
+ * 4. 其他情况都是 null
  */
-export type ReactFiberUpdateQueue = ReactFiberHostComponentUpdateQueue | ReactFiberHostRootUpdateQueue;
+export type ReactFiberUpdateQueue = ReactFiberHostComponentUpdateQueue | ReactFiberHostRootUpdateQueue | ReactFiberFunctionComponentUpdateQueue | null;
 
 
 export enum ReactFiberSideEffectTags {
   NoEffect = 0b00000000000,
   Placement = 0b00000000010,
   Update = 0b00000000100,
+  PlacementAndUpdate = 0b00000000110,
   Delete = 0b00000001000,
+  Passive = 0b01000000000, // 表示 fiber 上有 useEffect
 }
 
 export type FiberRoot = FiberNode & {

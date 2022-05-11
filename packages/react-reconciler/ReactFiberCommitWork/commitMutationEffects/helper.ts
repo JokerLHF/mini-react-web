@@ -1,5 +1,5 @@
-import { ReactFiberSideEffectTags, ReactFiberTag } from "../interface/fiber";
-import { FiberNode } from "../ReactFiber";
+import { ReactFiberSideEffectTags, ReactFiberTag } from "../../interface/fiber";
+import { FiberNode } from "../../ReactFiber";
 
 /**
  * 因为组件是没有真实 dom 的，所以要

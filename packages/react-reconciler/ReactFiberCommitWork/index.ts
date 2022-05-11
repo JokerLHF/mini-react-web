@@ -1,54 +1,70 @@
-import { FiberRoot, ReactFiberSideEffectTags } from "../interface/fiber";
+import { FiberRoot } from "../interface/fiber";
+import { ReactHookEffect } from "../interface/hook";
 import { FiberNode } from "../ReactFiber";
-import { commitDelete } from "./commitDelete";
-import { commitPlacement } from "./commitPlacement";
-import { commitUpdate } from "./commitUpdate";
+import { commitBeforeMutationEffects } from "./commitBeforeMutationEffects";
+import { commitLayoutEffects } from "./commitLayoutEffects";
+import { commitMutationEffects } from "./commitMutationEffects";
 
-const { 
-  Placement,
-  Delete,
-  Update
-} = ReactFiberSideEffectTags;
+/**
+ * 在React中commitWork中大部分逻辑是杂糅在 workLoop 中的，我将他们抽离到commitWork
+ * 为了逻辑抽离这里写成公共全局变量
+ */
+interface IGlobalCommitRootVariables {
+  pendingPassiveHookEffectsUnMount: (ReactHookEffect | FiberNode)[],
+  pendingPassiveHookEffectsMount: (ReactHookEffect | FiberNode)[],
+  rootDoesHavePassiveEffects: boolean,
+}
 
-const commitMutationEffects = (root: FiberNode, nextEffect: FiberNode | null) => {
-  while(nextEffect) {
-    const effectTag = nextEffect.effectTag;
-    // 只处理 Placement / Update / Deletion，排除其他effectTag干扰
-    const primaryEffectTag = effectTag & (Placement | Delete | Update);
-    switch (primaryEffectTag) {
-      case Placement:
-        commitPlacement(nextEffect);
-        // 去掉 Placement
-        nextEffect.effectTag &= ~Placement;
-        break;
-      case Delete:
-        commitDelete(nextEffect);
-         // 去掉 Delete
-         nextEffect.effectTag &= ~Delete;
-        break;
-      case Update:
-        commitUpdate(nextEffect);
-        // 去掉 Update
-        nextEffect.effectTag &= ~Update;
-        break;
-    }
-    nextEffect = nextEffect.nextEffect;
-  }
+export const globalCommitRootVariables: IGlobalCommitRootVariables = {
+  pendingPassiveHookEffectsUnMount: [],
+  pendingPassiveHookEffectsMount: [],
+  rootDoesHavePassiveEffects: false,
 }
 
 export const commitRoot = (root: FiberRoot) => {
   const finishedWork = root.alternate;
-  if (!finishedWork || !finishedWork.firstEffect) {
+  let firstEffect = finishedWork?.firstEffect;
+  if (!firstEffect) {
     return null;
   }
+  let nextEffect: FiberNode | null = null;
 
-  let firstEffect = finishedWork.firstEffect;
-  // TODO: before mutation阶段
+  // before mutation阶段
+  try {
+    commitBeforeMutationEffects(firstEffect)
+  } catch (e) {
+    console.warn('commit before mutation error', e);
+  }
 
   // mutation阶段
   try {
     commitMutationEffects(root, firstEffect);
   } catch(e) {
-    console.warn('commit mutaion error', e);
+    console.warn('commit mutation error', e);
+  }
+
+  // layout 阶段
+  try {
+    commitLayoutEffects(root, firstEffect);
+  } catch(e) {
+    console.warn('commit mutation error', e);
+  }
+
+  // ============ 渲染后: 断开effectList，方便垃圾回收 ============
+  // TODO: 这里不太明白为什么 【本次commit含有useEffect】 就不需要断开 effectList 了？？？
+  if (globalCommitRootVariables.rootDoesHavePassiveEffects) {
+    // 本次commit含有useEffect
+    globalCommitRootVariables.rootDoesHavePassiveEffects = false;
+  } else {
+    nextEffect = firstEffect;
+    while (nextEffect) {
+      const nextNextEffect: FiberNode | null = nextEffect.nextEffect;
+      nextEffect.nextEffect = null;
+      nextEffect = nextNextEffect;
+    }
   }
 }
+
+/**
+ * TOThink：effect 上的 hasEffect 这个标记好像没有什么用？？？？
+ */

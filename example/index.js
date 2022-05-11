@@ -1,6 +1,6 @@
 import { React, ReactDOM } from '../packages';
 
-const { useState } = React;
+const { useState, useEffect, useLayoutEffect } = React;
 
 function Children2() {
   return (
@@ -18,6 +18,16 @@ function Children1() {
 
 function App() {
   const [state, updateState] = useState(1);
+
+  useEffect(() => {
+    console.log('App-useEffect-mount');
+    return () => console.log('App-useEffect-unmount');
+  });
+
+  useLayoutEffect(() => {
+    console.log('App-useLayoutEffect-mount');
+    return () => console.log('App-useLayoutEffect-unmount');
+  });
 
   return (
     <div>

@@ -1,6 +1,6 @@
-import { ReactRoot } from "../../react-dom/ReactRoot";
-import { ReactFiberTag } from "../interface/fiber";
-import { FiberNode } from "../ReactFiber";
+import { ReactRoot } from "../../../react-dom/ReactRoot";
+import { ReactFiberTag } from "../../interface/fiber";
+import { FiberNode } from "../../ReactFiber";
 import { getHostParentFiber, getHostSibling, insertOrAppendPlacementNode } from "./helper";
 
 /**
