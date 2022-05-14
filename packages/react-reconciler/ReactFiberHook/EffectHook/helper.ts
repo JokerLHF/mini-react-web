@@ -38,7 +38,7 @@ const pushEffect = (tag: ReactHookEffectFlags, create: ReactHookEffectCreate, de
   return effect;
 }
 
-export const mountEffectImpl = (fiberEffectTag: ReactFiberSideEffectTags, hookEffectTag: ReactHookEffectFlags, create: ReactHookEffectCreate, deps: ReactHookEffectDeps | undefined) => {
+export const mountEffectImpl = (fiberEffectTag: ReactFiberSideEffectTags, hookEffectTag: ReactHookEffectFlags, create: ReactHookEffectCreate, deps?: ReactHookEffectDeps) => {
   const hook = mountWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
   const currentlyRenderingFiber = getCurrentlyRenderingFiber()!;
@@ -52,7 +52,7 @@ export const mountEffectImpl = (fiberEffectTag: ReactFiberSideEffectTags, hookEf
   )
 }
 
-export const updateEffectImpl = (fiberEffectTag: ReactFiberSideEffectTags, hookEffectTag: ReactHookEffectFlags, create: ReactHookEffectCreate, deps: ReactHookEffectDeps | undefined) => {
+export const updateEffectImpl = (fiberEffectTag: ReactFiberSideEffectTags, hookEffectTag: ReactHookEffectFlags, create: ReactHookEffectCreate, deps?: ReactHookEffectDeps) => {
   const hook = updateWorkInProgressHook();
   const nextDeps = deps === undefined ? null : deps;
   let destroy = undefined;
@@ -61,13 +61,11 @@ export const updateEffectImpl = (fiberEffectTag: ReactFiberSideEffectTags, hookE
   if (currentHook) {
     const prevEffect = currentHook.memoizedState as ReactHookEffect;
     destroy = prevEffect.destroy;
-    if (nextDeps !== null) {
-      const prevDeps = prevEffect.deps;
-      if (areHookInputsEqual(nextDeps, prevDeps)) {
-        // deps相同，不需要为fiber增加effectTag
-        pushEffect(hookEffectTag, create, destroy, nextDeps);
-        return;
-      }
+    const prevDeps = prevEffect.deps;
+    if (areHookInputsEqual(nextDeps, prevDeps)) {
+      // deps相同，不需要为fiber增加effectTag
+      pushEffect(hookEffectTag, create, destroy, nextDeps);
+      return;
     }
   }
 
@@ -82,13 +80,11 @@ export const updateEffectImpl = (fiberEffectTag: ReactFiberSideEffectTags, hookE
   );
 }
 
-const areHookInputsEqual = (nextDeps: any[], prevDeps: ReactHookEffectDeps) => {
-  if (prevDeps === null) {
+export const areHookInputsEqual = (nextDeps: any[] | null, prevDeps: any[] | null) => {
+  if (!prevDeps || !nextDeps) {
     return false;
   }
-  if (nextDeps.length !== prevDeps.length) {
-    console.error('前后deps长度不一致');
-  }
+
   for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
     if (Object.is(nextDeps[i], prevDeps[i])) {
       continue;

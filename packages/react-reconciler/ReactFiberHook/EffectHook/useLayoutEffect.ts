@@ -2,7 +2,7 @@ import { ReactFiberSideEffectTags } from "../../interface/fiber"
 import { ReactHookEffectCreate, ReactHookEffectDeps, ReactHookEffectFlags } from "../../interface/hook"
 import { mountEffectImpl, updateEffectImpl } from "./helper";
 
-export const mountLayoutEffect = (create: ReactHookEffectCreate, deps: ReactHookEffectDeps | undefined) => {
+export const mountLayoutEffect = (create: ReactHookEffectCreate, deps?: ReactHookEffectDeps) => {
   /**
    * fiber 增加 Update 才能在 completeWork 时候被收集到 effectList 中
    */
@@ -15,7 +15,7 @@ export const mountLayoutEffect = (create: ReactHookEffectCreate, deps: ReactHook
   );
 }
 
-export const updateLayoutEffect = (create: ReactHookEffectCreate, deps: ReactHookEffectDeps | undefined) => {
+export const updateLayoutEffect = (create: ReactHookEffectCreate, deps?: ReactHookEffectDeps) => {
  /**
    * fiber 增加 Update 才能在 completeWork 时候被收集到 effectList 中
    */

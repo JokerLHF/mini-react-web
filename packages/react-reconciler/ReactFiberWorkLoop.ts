@@ -38,8 +38,10 @@ const workLoopSync = () => {
 
 const performSyncWorkOnRoot = (root: FiberRoot) => {
   // render 阶段
+  console.log('开始 render 阶段');
   workLoopSync();
   // commit 阶段
+  console.log('开始 commitRoot 阶段');
   commitRoot(root);
 }
 

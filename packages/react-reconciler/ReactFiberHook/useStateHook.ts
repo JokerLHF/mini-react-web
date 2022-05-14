@@ -71,8 +71,7 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
     baseQueue = queue.pending;
     queue.pending = null;
   }
-  
-  
+
   if (baseQueue) {
     let newState = getCurrentHook()?.memoizedState;
     // baseQueue 是一个环形链表，越往有的update时间越完，此时的 baseQueue.next 就是一个进来的 update

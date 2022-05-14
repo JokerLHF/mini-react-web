@@ -81,13 +81,19 @@ const diffStyle = (propKey: string, prevPropVal: any, nextPropVal: any) => {
   return null;
 }
 
+/**
+ * TODO：每次 FunctionComponent reRender 的时候 props onClick 的指向都会改变，所以 removeEventListener 无法删除。
+ * 导致点击多次 div 上绑定了多个同样内容 onClick 事件。触发了多次 onClick
+ */
 const patchEvent = (el: HTMLElement, key: string, prevPropVal: any, nextPropVal: any) => {
   // 事件
   if (/^on[^a-z]/.test(key)) {
     if (!isFunction(nextPropVal)) {
       return;
     }
+    
     const eventName = key.slice(2).toLowerCase();
+    
     if (prevPropVal && isFunction(prevPropVal)) {
       el.removeEventListener(eventName, prevPropVal);
     }
