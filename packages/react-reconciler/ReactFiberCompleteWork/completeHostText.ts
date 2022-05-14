@@ -1,6 +1,6 @@
 import { ReactFiberSideEffectTags } from "../interface/fiber";
 import { FiberNode } from "../ReactFiber";
-import { createTextInstance } from "./helper";
+import { createTextInstance, precacheFiberNode } from "./helper";
 
 /**
  *  对比新旧 text，不同 effectTag 增加 update
@@ -17,9 +17,11 @@ export const completeHostTextWork = (current: FiberNode | null, workInProgress: 
     const newText = current.pendingProps._reactTextContent;
     const oldText = workInProgress.pendingProps._reactTextContent;
     updateHostText(workInProgress, newText, oldText);
+    precacheFiberNode(workInProgress, workInProgress.stateNode as Text);
     return;
   }
 
   // fiber 创建阶段
   workInProgress.stateNode = createTextInstance(workInProgress.pendingProps._reactTextContent);
+  precacheFiberNode(workInProgress, workInProgress.stateNode as Text);
 }

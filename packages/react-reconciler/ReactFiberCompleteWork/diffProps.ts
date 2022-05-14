@@ -1,6 +1,6 @@
 
 import { ReactNodeProps } from "../../react/interface";
-import { isFunction, isObject, isString } from "../../shared/utils";
+import { isObject, isString } from "../../shared/utils";
 
 export const patchClass = (el: HTMLElement, nextPropVal: any) => {
   if (isString(nextPropVal)) {
@@ -28,7 +28,6 @@ export const setInitialDOMProperties = (instance: HTMLElement, nextProps: ReactN
         patchStyle(instance, newProp);
         break;
       default:
-        patchEvent(instance, propKey, null, newProp);
         break;
     }
   }
@@ -57,8 +56,6 @@ export const diffProperties = (instance: HTMLElement, oldProps: ReactNodeProps, 
         }
         break;
       default:
-        // 因为没有做合成事件，所以这里就先直接 patch 了，不走 update 逻辑。
-        patchEvent(instance, propKey, oldProp, newProp);
         break;
     }
   }
@@ -79,26 +76,4 @@ const diffStyle = (propKey: string, prevPropVal: any, nextPropVal: any) => {
     return [propKey, nextPropVal]
   }
   return null;
-}
-
-/**
- * TODO：每次 FunctionComponent reRender 的时候 props onClick 的指向都会改变，所以 removeEventListener 无法删除。
- * 导致点击多次 div 上绑定了多个同样内容 onClick 事件。触发了多次 onClick
- */
-const patchEvent = (el: HTMLElement, key: string, prevPropVal: any, nextPropVal: any) => {
-  // 事件
-  if (/^on[^a-z]/.test(key)) {
-    if (!isFunction(nextPropVal)) {
-      return;
-    }
-    
-    const eventName = key.slice(2).toLowerCase();
-    
-    if (prevPropVal && isFunction(prevPropVal)) {
-      el.removeEventListener(eventName, prevPropVal);
-    }
-    if (nextPropVal && isFunction(nextPropVal)) {
-      el.addEventListener(eventName, nextPropVal);
-    }
-  }
 }

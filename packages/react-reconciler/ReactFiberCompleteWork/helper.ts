@@ -33,10 +33,17 @@ export const collectEffectListToParent = (returnFiber: FiberNode | null, workInP
 }
 
 export const createTextInstance = (text: string) => {
-  return document.createTextNode(text);
+  const textElement = document.createTextNode(text);
+  return textElement;
 }
 
 export const createInstance = (type: string) => {
   const domElement = document.createElement(type);
   return domElement;
+}
+
+const randomKey = Math.random().toString(36).slice(2);
+export const internalInstanceKey = '__reactFiber$' + randomKey;
+export function precacheFiberNode(fiber: FiberNode, node: HTMLElement | Text) {
+  (node as any)[internalInstanceKey] = fiber;
 }

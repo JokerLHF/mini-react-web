@@ -73,9 +73,7 @@ export const beginWork = (current: FiberNode | null, workInProgress: FiberNode):
       return updateHostComponent(current, workInProgress);
     case ReactFiberTag.FunctionComponent:
       return updateFunctionComponent(current, workInProgress);
-    case ReactFiberTag.HostText:
-      // 文本节点不可能有子节点，直接返回null
-      return null;
+    case ReactFiberTag.HostText: // 文本节点不可能有子节点，直接返回null
     default:
       return null;
   }

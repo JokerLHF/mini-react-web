@@ -1,7 +1,7 @@
 import { ReactFiberSideEffectTags, ReactFiberTag } from "../interface/fiber";
 import { FiberNode } from "../ReactFiber";
 import { diffProperties, setInitialDOMProperties } from "./diffProps";
-import { createInstance } from "./helper";
+import { createInstance, precacheFiberNode } from "./helper";
 
 /**
  *     div
@@ -66,6 +66,7 @@ export const completeHostComponentWork = (current: FiberNode | null, workInProgr
   // fiber复用阶段：同时存在 current 以及 stateNode 表示 fiber 复用了，新建的情况下没有 current 和 stateNode
   if (current && workInProgress.stateNode) {
     updateHostComponent(current, workInProgress);
+    precacheFiberNode(workInProgress, workInProgress.stateNode as HTMLElement);
     return;
   }
 
@@ -75,5 +76,7 @@ export const completeHostComponentWork = (current: FiberNode | null, workInProgr
   workInProgress.stateNode = instance;
   // 在 dom 上挂载 props，比如注册事件
   setInitialDOMProperties(instance, workInProgress.pendingProps);
+
+  precacheFiberNode(workInProgress, instance);
   return null;
 }
