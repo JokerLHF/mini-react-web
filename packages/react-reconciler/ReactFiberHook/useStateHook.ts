@@ -87,11 +87,7 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
     hook.memoizedState = newState;
   }
 
-  // TODO: 这里 react 没有重新 bind 一次
-  // 第一次更新渲染的 fiber 树都是新建的。跟首次渲染的 fiber 树只有 alternate 的关系
-  // 如果不重新 bind 一次，会导致第二次更新渲染比较的不是第一次更新渲染的fiber树。而是首次渲染的 fiber 树
-  const dispatch: Dispatch<BasicStateAction<S>> 
-    = dispatchAction.bind(null, getCurrentlyRenderingFiber() as FiberNode, queue);
+  const dispatch = queue.dispatch!;
   return [hook.memoizedState, dispatch];
 }
 

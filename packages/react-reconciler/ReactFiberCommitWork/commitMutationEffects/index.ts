@@ -11,7 +11,7 @@ const {
   PlacementAndUpdate,
 } = ReactFiberSideEffectTags;
 
-export const commitMutationEffects = (root: FiberNode, nextEffect: FiberNode) => {
+export const commitMutationEffects = (nextEffect: FiberNode) => {
   let finishedWork: FiberNode | null = nextEffect;
   while(finishedWork) {
     const effectTag = finishedWork.effectTag;

@@ -8,7 +8,7 @@ import { FiberNode } from "../ReactFiber";
  *  1. 执行当前 useLayoutEffect 的 create 函数
  *  2. 筛选出由 useEffect() 创建的 effect
  */
-export const commitLayoutEffects = (root: FiberNode, nextEffect: FiberNode) => {
+export const commitLayoutEffects = (nextEffect: FiberNode) => {
   let currentEffect: FiberNode | null = nextEffect;
   while(currentEffect) {    
     // 1. 执行当前 useLayoutEffect 的 create 函数

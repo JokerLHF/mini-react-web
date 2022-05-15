@@ -1,3 +1,4 @@
+import { ReactRoot } from "../react-dom/ReactRoot";
 import { FiberRoot, ReactFiberTag } from "./interface/fiber";
 import { createWorkInProgress, FiberNode } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
@@ -6,28 +7,28 @@ import { completeUnitOfWork } from "./ReactFiberCompleteWork";
 
 let workInProgress: FiberNode | null = null;
 
-// 从 fiber 向上直到 FiberRoot
+// 从 fiber 向上直到 reactRoot
 const markUpdateTimeFromFiberToRoot = (fiber: FiberNode) => {
-  let rootFiber = null;
+  let reactRoot = null;
   let node = fiber.return;
 
   if (!node && fiber.tag === ReactFiberTag.HostRoot) {
-    rootFiber = fiber as FiberRoot;
+    reactRoot = (fiber as FiberRoot).stateNode;
   } else {
     while (node) {
       if (!node.return && node.tag === ReactFiberTag.HostRoot) {
-        rootFiber = node as FiberRoot;
+        reactRoot = (node as FiberRoot).stateNode;
         break;
       }
       node = node.return;
     }
   }
 
-  return rootFiber;
+  return reactRoot;
 }
 
-const prepareFreshStack = (rootFiber: FiberRoot) => {
-  workInProgress = createWorkInProgress(rootFiber, {});
+const prepareFreshStack = (reactRoot: ReactRoot) => {
+  workInProgress = createWorkInProgress(reactRoot.current, {});
 }
 
 const workLoopSync = () => {
@@ -36,13 +37,13 @@ const workLoopSync = () => {
   }
 }
 
-const performSyncWorkOnRoot = (root: FiberRoot) => {
+const performSyncWorkOnRoot = (reactRoot: ReactRoot) => {
   // render 阶段
   console.log('开始 render 阶段');
   workLoopSync();
   // commit 阶段
   console.log('开始 commitRoot 阶段');
-  commitRoot(root);
+  commitRoot(reactRoot);
 }
 
 const performUnitOfWork = (unitOfWork: FiberNode) => {
@@ -57,10 +58,10 @@ const performUnitOfWork = (unitOfWork: FiberNode) => {
 }
 
 export const scheduleUpdateOnFiber = (fiber: FiberNode) => {
-  const root = markUpdateTimeFromFiberToRoot(fiber);
-  if (root !== null) {
-    prepareFreshStack(root);
-    performSyncWorkOnRoot(root);
+  const reactRoot = markUpdateTimeFromFiberToRoot(fiber);
+  if (reactRoot !== null) {
+    prepareFreshStack(reactRoot);
+    performSyncWorkOnRoot(reactRoot);
   }
 }
 

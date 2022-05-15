@@ -1,3 +1,4 @@
+import { ReactRoot } from "../../react-dom/ReactRoot";
 import { FiberRoot } from "../interface/fiber";
 import { ReactHookEffect } from "../interface/hook";
 import { FiberNode } from "../ReactFiber";
@@ -21,12 +22,13 @@ export const globalCommitRootVariables: IGlobalCommitRootVariables = {
   rootDoesHavePassiveEffects: false,
 }
 
-export const commitRoot = (root: FiberRoot) => {
-  const finishedWork = root.alternate;
-  let firstEffect = finishedWork?.firstEffect;
-  if (!firstEffect) {
+export const commitRoot = (reactRoot: ReactRoot) => {
+  const finishedWork = reactRoot.current.alternate;
+  if (!finishedWork?.firstEffect) {
     return null;
   }
+
+  let firstEffect = finishedWork.firstEffect;
   let nextEffect: FiberNode | null = null;
 
   // before mutation阶段
@@ -38,17 +40,20 @@ export const commitRoot = (root: FiberRoot) => {
 
   // mutation阶段
   try {
-    commitMutationEffects(root, firstEffect);
+    commitMutationEffects(firstEffect);
   } catch(e) {
     console.warn('commit mutation error', e);
   }
 
   // layout 阶段
   try {
-    commitLayoutEffects(root, firstEffect);
+    commitLayoutEffects(firstEffect);
   } catch(e) {
     console.warn('commit mutation error', e);
   }
+
+  // 修改 current 树
+  reactRoot.current = finishedWork;
 
   // ============ 渲染后: 断开effectList，方便垃圾回收 ============
   // TODO: 这里不太明白为什么 【本次commit含有useEffect】 就不需要断开 effectList 了？？？
