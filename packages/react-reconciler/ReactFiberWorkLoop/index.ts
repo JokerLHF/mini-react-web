@@ -1,9 +1,9 @@
-import { ReactRoot } from "../react-dom/ReactRoot";
-import { FiberRoot, ReactFiberTag } from "./interface/fiber";
-import { createWorkInProgress, FiberNode } from "./ReactFiber";
-import { beginWork } from "./ReactFiberBeginWork";
-import { commitRoot } from "./ReactFiberCommitWork";
-import { completeUnitOfWork } from "./ReactFiberCompleteWork";
+import { ReactRoot } from "../../react-dom/ReactRoot";
+import { FiberRoot, ReactFiberTag } from "../interface/fiber";
+import { createWorkInProgress, FiberNode } from "../ReactFiber";
+import { beginWork } from "../ReactFiberBeginWork";
+import { commitRoot } from "../ReactFiberCommitWork";
+import { completeUnitOfWork } from "../ReactFiberCompleteWork";
 
 let workInProgress: FiberNode | null = null;
 
@@ -64,4 +64,3 @@ export const scheduleUpdateOnFiber = (fiber: FiberNode) => {
     performSyncWorkOnRoot(reactRoot);
   }
 }
-
