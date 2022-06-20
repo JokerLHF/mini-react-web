@@ -14,6 +14,17 @@ export enum ReactFiberTag {
   FunctionComponent = 4,
 }
 
+
+/**
+ * 对于 FiberRoot 来说 props 是 null
+ * 对于 textFiber 的 props 就是 string，也就是 textContent
+ * 其他有 props 的就是对象, 也就是 createElement 的 props
+ */
+export type ReactTextFiberProps = string;
+export type ReactNormalFiberProps = Record<string, any>;
+export type ReactFiberRootProps = null;
+export type ReactFiberProps = ReactNormalFiberProps | ReactFiberRootProps | ReactTextFiberProps;
+
 export interface FunctionComponent {
 	(props?: ReactNodeProps): ReactNode | null;
 }

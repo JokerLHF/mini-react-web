@@ -1,4 +1,4 @@
-import { ReactNodeProps } from "../../../react/interface";
+import { ReactFiberProps } from "../../interface/fiber";
 import { createWorkInProgress, FiberNode } from "../../ReactFiber";
 
 /**
@@ -7,7 +7,7 @@ import { createWorkInProgress, FiberNode } from "../../ReactFiber";
  * - newElement
  * - 在 diff 过程中 oldFiber2 可以被复用作为 newElement，所以需要重置 sibling 以及 index
  */
-export const useFiberAsSingle = (fiber: FiberNode, pendingProps: ReactNodeProps) => {
+export const useFiberAsSingle = (fiber: FiberNode, pendingProps: ReactFiberProps) => {
   const cloneFiber = createWorkInProgress(fiber, pendingProps);
   cloneFiber.sibling = null;
   cloneFiber.index = 0;

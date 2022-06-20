@@ -18,7 +18,7 @@ import { placeSingleChild } from "./placeChild";
   
   // key，type相同，复用节点
   if (oldFiber && oldFiber.tag === ReactFiberTag.HostText) { // 在写 jsx 的时候文本节点是没有办法自定义 key 的。所以文本节点只能通过 tag 去判断
-    const existing = useFiberAsSingle(oldFiber, { _reactTextContent: textContent });
+    const existing = useFiberAsSingle(oldFiber,  textContent);
     existing.return = returnFiber;
     return existing;
   }

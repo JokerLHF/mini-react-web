@@ -1,10 +1,10 @@
-import { ReactNode, ReactNodeKey, ReactNodeProps } from "../react/interface";
-import { ReactFiberMemoizedState, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
+import { ReactNode, ReactNodeKey } from "../react/interface";
+import { ReactFiberMemoizedState, ReactFiberProps, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
 
 export class FiberNode {
   tag: ReactFiberTag;
   key: ReactNodeKey;
-  pendingProps: ReactNodeProps;
+  pendingProps: ReactFiberProps;
   type: ReactFiberType;
   stateNode: ReactFiberStateNode;
 
@@ -22,7 +22,7 @@ export class FiberNode {
   nextEffect: FiberNode | null;
   index: number;
 
-  constructor(tag: ReactFiberTag, pendingProps: ReactNodeProps = {}, key: ReactNodeKey = null) {
+  constructor(tag: ReactFiberTag, pendingProps: ReactFiberProps = null, key: ReactNodeKey = null) {
 
     /**
      * 作为静态数据
@@ -85,7 +85,7 @@ export const cloneChildFibers = (workInProgress: FiberNode) => {
 
 
 // 为 current fiber 创建对应的 alternate fiber
-export const createWorkInProgress = (current: FiberNode, pendingProps: ReactNodeProps) => {
+export const createWorkInProgress = (current: FiberNode, pendingProps: ReactFiberProps) => {
   let workInProgress = current.alternate;
 
   if (!workInProgress) {
@@ -121,10 +121,6 @@ export const createFiberFromElement = (element: ReactNode) => {
 }
 
 export const createFiberFromText = (textContent: string) => {
-  /**
-   * TIPS: 这里为了保持 props 都是对象，比较容易处理，所以 textContent 包裹在 props 里
-   * 但是 React 不是，ReactFiber props 可能是对象也有可能是文本字符串。（感觉react的处理增加了复杂度🤔🤔🤔）
-   */
-  const fiber = new FiberNode(ReactFiberTag.HostText, { _reactTextContent: textContent });
+  const fiber = new FiberNode(ReactFiberTag.HostText, textContent);
   return fiber;
 }

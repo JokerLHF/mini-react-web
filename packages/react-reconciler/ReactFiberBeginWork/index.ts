@@ -1,9 +1,9 @@
-import { ReactNodeChildren } from "../react/interface";
-import { FunctionComponent, ReactFiberTag } from "./interface/fiber";
-import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
-import { FiberNode } from "./ReactFiber";
-import { renderWithHooks } from "./ReactFiberHook";
-import { processUpdateQueue } from "./ReactUpdateQueue";
+import { ReactNodeChildren } from "../../react/interface";
+import { FunctionComponent, ReactFiberTag } from "../interface/fiber";
+import { mountChildFibers, reconcileChildFibers } from "../ReactChildFiber";
+import { FiberNode } from "../ReactFiber";
+import { renderWithHooks } from "../ReactFiberHook";
+import { processUpdateQueue } from "../ReactUpdateQueue";
 
 const reconcileChildren = (current: FiberNode | null, workInProgress: FiberNode, nextChildren: ReactNodeChildren) => {
   // mount 阶段只有 root 节点存在 current
@@ -37,6 +37,13 @@ const updateHostRoot = (current: FiberNode, workInProgress: FiberNode) => {
 
 const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNode) => {
   const nextProps = workInProgress.pendingProps;
+
+  // 排除掉 null 和 textContent 情况，hostComponent 的 props 只能是对象
+  if (!nextProps || typeof nextProps === 'string') {
+    console.warn('updateHostComponent error happen');
+    return null;
+  }
+
   let nextChildren = nextProps.children;
 
   reconcileChildren(current, workInProgress, nextChildren);
@@ -47,7 +54,14 @@ const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNod
  * 对于 FunctionComponent fiber 来说，需要执行获取 children
  */
 const updateFunctionComponent = (current: FiberNode | null, workInProgress: FiberNode) => {
-  const { pendingProps, type } = workInProgress
+  const { pendingProps, type } = workInProgress;
+
+  // 排除掉 null 和 textContent 情况，functionComponent 的 props 只能是对象
+  if (!pendingProps || typeof pendingProps === 'string') {
+    console.warn('updateFunctionComponent error happen');
+    return null;
+  }
+
   const children = renderWithHooks(current, workInProgress, type as FunctionComponent, pendingProps);
   if (!children) {
     return null;
