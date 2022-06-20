@@ -2,11 +2,13 @@ import { SchedulerSyncCallback, SchedulerPriorityLevel, SchedulerTask } from "..
 import { cancelCallback, scheduleCallback } from "../schedulerCallback";
 import { getCurrentPriorityLevel, setCurrentPriorityLevel } from "../schedulerCallback/requestHostCallback";
 
+export type FakeSchedulerTask = Record<any, any>;
+
 // 保存所有同步任务的队列
 let syncQueue: SchedulerSyncCallback[] | null = null;
 let immediateQueueCallbackNode: SchedulerTask | null = null;
 
-const fakeCallbackNode = {};
+const fakeCallbackNode: FakeSchedulerTask = {};
 // 在执行 syncCallback 阶段
 let isFlushingSyncQueue = false;
 
