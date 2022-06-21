@@ -1,4 +1,4 @@
-import { ReactFiberSideEffectTags, ReactFiberTag } from "../interface/fiber";
+import { ReactFiberSideEffectTags, ReactFiberTag, ReactNormalFiberProps } from "../interface/fiber";
 import { FiberNode } from "../ReactFiber";
 import { diffProperties, setInitialDOMProperties } from "./diffProps";
 import { createInstance, precacheFiberNode } from "./helper";
@@ -48,8 +48,8 @@ export const appendAllChildren = (parent: HTMLElement, workInProgress: FiberNode
 
 // 比较 newProps 和 oldProps，不同 effectTag 增加 update
 const updateHostComponent = (current: FiberNode, workInProgress: FiberNode) => {
-  const oldProps = current.pendingProps;
-  const newProps = workInProgress.pendingProps;
+  const oldProps = current.pendingProps as ReactNormalFiberProps;
+  const newProps = workInProgress.pendingProps as ReactNormalFiberProps;
   if (oldProps === newProps) {
     return;
   }
@@ -75,7 +75,7 @@ export const completeHostComponentWork = (current: FiberNode | null, workInProgr
   appendAllChildren(instance, workInProgress);
   workInProgress.stateNode = instance;
   // 在 dom 上挂载 props，比如注册事件
-  setInitialDOMProperties(instance, workInProgress.pendingProps);
+  setInitialDOMProperties(instance, workInProgress.pendingProps as ReactNormalFiberProps);
 
   precacheFiberNode(workInProgress, instance);
   return null;

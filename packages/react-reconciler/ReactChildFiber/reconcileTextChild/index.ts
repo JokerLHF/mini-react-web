@@ -15,7 +15,7 @@ export const reconcileSingleTextChild = (returnFiber: FiberNode,  currentFirstCh
     // 在旧节点中找到可以复用的节点，其他旧节点
     deleteRemainingChildren(returnFiber, currentFirstChild.sibling);
     // 复用 oldFiber
-    const existing = useFiberAsSingle(currentFirstChild, { _reactTextContent: newChild });
+    const existing = useFiberAsSingle(currentFirstChild, newChild);
     existing.return = returnFiber;
     return placeSingleChild(existing);
   }

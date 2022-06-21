@@ -1,4 +1,4 @@
-import { ReactFiberTag } from "../../react-reconciler/interface/fiber";
+import { ReactFiberTag, ReactNormalFiberProps } from "../../react-reconciler/interface/fiber";
 import { FiberNode } from "../../react-reconciler/ReactFiber";
 import { internalInstanceKey } from "../../react-reconciler/ReactFiberCompleteWork/helper";
 import { isFunction } from "../../shared/utils";
@@ -81,6 +81,7 @@ const getReactEventName = (domEventName: string, isCapturePhaseListener: boolean
 }
 
 const getListener = (fiber: FiberNode, reactEventName: string) => {
-  const listener = fiber.pendingProps[reactEventName];
+  // 只有 HostComponent 才能注册 事件, HostComponent 的 props 是对象
+  const listener = (fiber.pendingProps as ReactNormalFiberProps)[reactEventName];
   return isFunction(listener) ? listener : null;
 }

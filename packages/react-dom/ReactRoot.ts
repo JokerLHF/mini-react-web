@@ -4,9 +4,9 @@ import { FiberNode } from "../react-reconciler/ReactFiber"
 import { ReactExpirationTime } from "../react-reconciler/ReactFiberExpirationTime/interface";
 import { scheduleUpdateOnFiber } from "../react-reconciler/ReactFiberWorkLoop";
 import { createUpdate, enqueueUpdate, initializeUpdateQueue } from "../react-reconciler/ReactUpdateQueue";
-import { ReactNode } from "../react/interface"
 import { SchedulerPriorityLevel, SchedulerTask } from "../scheduler/interface";
 import { FakeSchedulerTask } from "../scheduler/scheduleSyncCallback";
+import { ReactElement } from "../react/interface"
 
 export class ReactRoot {
   current: FiberNode;
@@ -45,7 +45,7 @@ export class ReactRoot {
     (window as any).ReactRootFiber = this.current;
   }
 
-  render = (element: ReactNode) => {
+  render = (element: ReactElement) => {
     const expirationTime = performance.now();
     const update = createUpdate(expirationTime);
     update.payload = { element };

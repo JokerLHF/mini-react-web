@@ -28,7 +28,7 @@ const markUpdateTimeFromFiberToRoot = (fiber: FiberNode) => {
 }
 
 const prepareFreshStack = (reactRoot: ReactRoot) => {
-  workInProgress = createWorkInProgress(reactRoot.current, {});
+  workInProgress = createWorkInProgress(reactRoot.current, null);
 }
 
 const workLoopSync = () => {

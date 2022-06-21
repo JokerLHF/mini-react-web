@@ -1,4 +1,4 @@
-import { ReactFiberFunctionComponentUpdateQueue, ReactFiberHostComponentUpdateQueue, ReactFiberTag } from "../../interface/fiber";
+import { ReactFiberFunctionComponentUpdateQueue, ReactFiberHostComponentUpdateQueue, ReactFiberTag, ReactTextFiberProps } from "../../interface/fiber";
 import { ReactHookEffectFlags } from "../../interface/hook";
 import { FiberNode } from "../../ReactFiber";
 import { patchClass, patchStyle } from "../../ReactFiberCompleteWork/diffProps";
@@ -47,7 +47,7 @@ const updateHostComponent = (finishedWork: FiberNode) => {
 
 const updateHostText = (finishedWork: FiberNode) => {
   const instance = finishedWork.stateNode as Text;
-  const newText = finishedWork.pendingProps._reactTextContent;
+  const newText = finishedWork.pendingProps as ReactTextFiberProps;
   instance.nodeValue = newText;
 }
 

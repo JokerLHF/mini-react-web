@@ -2,6 +2,7 @@ import { mountWorkInProgressHook, getCurrentlyRenderingFiber, getCurrentHook, up
 import { BasicStateAction, Dispatch, Hook, ReactHookReducer, Update, UpdateQueue } from "../interface/hook";
 import { FiberNode } from "../ReactFiber";
 import { scheduleUpdateOnFiber } from "../ReactFiberWorkLoop";
+import { markWorkInProgressReceivedUpdate } from "../ReactFiberBeginWork";
 
 
 export const dispatchAction = <A>(fiber: FiberNode, queue: UpdateQueue<A>, action: A) => {
@@ -84,6 +85,17 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
       update = (update as Update<any>).next;
     } while(update && update !== first);
 
+    /**
+     * 执行 updateQueue 得到的 update 与原来的 state 值做对比判断是否需要更新。
+     * 做这一步的目的是优化，因为有可能多次 setState 的值相同，根本不需要更新：
+     *    const [state, setState] = useState(1);
+     *    setState(1)
+     *    setState(1)
+     */
+    if (!Object.is(newState, hook.memoizedState)) {
+      markWorkInProgressReceivedUpdate();
+    }
+  
     hook.memoizedState = newState;
   }
 
