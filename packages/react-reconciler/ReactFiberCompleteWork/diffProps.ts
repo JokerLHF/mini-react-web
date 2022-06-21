@@ -1,5 +1,5 @@
 
-import { ReactNodeProps } from "../../react/interface";
+import { ReactElementProps } from "../../react/interface";
 import { isObject, isString } from "../../shared/utils";
 
 export const patchClass = (el: HTMLElement, nextPropVal: any) => {
@@ -17,7 +17,7 @@ export const patchStyle = (el: HTMLElement, nextPropVal: any) => {
 }
 
 // 这里的 props 简单处理后续有余力再看合成事件，现在只支持最简单的事件以及 style className
-export const setInitialDOMProperties = (instance: HTMLElement, nextProps: ReactNodeProps) => {
+export const setInitialDOMProperties = (instance: HTMLElement, nextProps: ReactElementProps) => {
   for (let propKey in nextProps) {
     const newProp = nextProps[propKey];
     switch (propKey) {
@@ -33,7 +33,7 @@ export const setInitialDOMProperties = (instance: HTMLElement, nextProps: ReactN
   }
 }
 
-export const diffProperties = (instance: HTMLElement, oldProps: ReactNodeProps, newProps: ReactNodeProps) => {
+export const diffProperties = (instance: HTMLElement, oldProps: ReactElementProps, newProps: ReactElementProps) => {
   let updatePayload: any[] | null = null;
   for (let propKey in newProps) {
     const newProp = newProps[propKey];

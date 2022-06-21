@@ -1,9 +1,9 @@
-import { ReactNode, ReactNodeKey } from "../react/interface";
+import { ReactElement, ReactElementKey } from "../react/interface";
 import { ReactFiberMemoizedState, ReactFiberProps, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
 
 export class FiberNode {
   tag: ReactFiberTag;
-  key: ReactNodeKey;
+  key: ReactElementKey;
   pendingProps: ReactFiberProps;
   type: ReactFiberType;
   stateNode: ReactFiberStateNode;
@@ -22,7 +22,7 @@ export class FiberNode {
   nextEffect: FiberNode | null;
   index: number;
 
-  constructor(tag: ReactFiberTag, pendingProps: ReactFiberProps = null, key: ReactNodeKey = null) {
+  constructor(tag: ReactFiberTag, pendingProps: ReactFiberProps = null, key: ReactElementKey = null) {
 
     /**
      * 作为静态数据
@@ -112,7 +112,7 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: ReactFibe
   return workInProgress;
 }
 
-export const createFiberFromElement = (element: ReactNode) => {
+export const createFiberFromElement = (element: ReactElement) => {
   const { type, key, props } = element;
   const tag = typeof type === 'function' ? ReactFiberTag.FunctionComponent : ReactFiberTag.HostComponent;
   const fiber = new FiberNode(tag, props, key);

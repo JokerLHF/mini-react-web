@@ -1,5 +1,5 @@
 import { ReactRoot } from "../../react-dom/ReactRoot";
-import { ReactNode, ReactNodeProps } from "../../react/interface";
+import { ReactElementProps, ReactNode } from "../../react/interface";
 import { FiberNode } from "../ReactFiber";
 import { Hook, ReactHookEffect } from "./hook";
 
@@ -26,12 +26,12 @@ export type ReactFiberRootProps = null;
 export type ReactFiberProps = ReactNormalFiberProps | ReactFiberRootProps | ReactTextFiberProps;
 
 export interface FunctionComponent {
-	(props?: ReactNodeProps): ReactNode | null;
+	(props?: ReactElementProps): ReactNode;
 }
 
 /**
  * 1. 对于 FunctionComponent, 存储的是 hook 对象环形链表
- * 2. 对于 ReactRoot, 存储的就是对象，属性 element 就是组件
+ * 2. 对于 FiberRoot, 存储的就是对象，属性 element 就是组件
  * 3. 其他情况都是 null
  */
 export type ReactFiberMemoizedState = Hook | Record<string, any> | null;
@@ -47,7 +47,7 @@ export type ReactFiberType = string | FunctionComponent | null;
 /**
  * 1. 对于 HostComponent 指真实的 DOM节点
  * 2. 对于 HostText 来说就是 Text节点
- * 3. 对于 RootFiber 来说就是 ReactRoot 这个类本身
+ * 3. 对于 FiberRoot 来说就是 ReactRoot 这个类本身
  * 4. 其他情况都是 null
  */
 export type ReactFiberStateNode = HTMLElement | Text | ReactRoot | null;

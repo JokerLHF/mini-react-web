@@ -1,5 +1,5 @@
 import { deleteChild, deleteRemainingChildren } from "../helper/deleteChild";
-import { ReactNode } from "../../../react/interface";
+import { ReactElement } from "../../../react/interface";
 import { createFiberFromElement, FiberNode } from "../../ReactFiber";
 import { useFiberAsSingle } from "../helper/cloneChild";
 
@@ -9,7 +9,7 @@ import { useFiberAsSingle } from "../helper/cloneChild";
  *   - 新节点：element
  * - mount阶段：根据【新节点】创建 fiber
  */
-export const reconcileSingleElement = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, element: ReactNode) => {
+export const reconcileSingleElement = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, element: ReactElement) => {
   let oldFiber = currentFirstChild;
   const key = element.key;
   // update 阶段

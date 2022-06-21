@@ -1,4 +1,4 @@
-import { ReactNode, ReactNodeChild, ReactNodeChildren } from "../../react/interface";
+import { ReactElement, ReactNode } from "../../react/interface";
 import { isArray, isObject, isText } from "../../shared/utils";
 import { FiberNode } from "../ReactFiber";
 import { reconcileChildrenArray } from "./reconcileArrayChildren";
@@ -14,12 +14,12 @@ const ChildReconciler = (trackSideEffects: boolean) => {
   /**
    * 根据 newChild 的类型生成对于的 fiber 节点, 对于 null 或者 undefined 直接返回 null，不渲染成 fiber 节点
    */
-  const reconcileChildFibers = (returnFiber: FiberNode, currentFirstChild: FiberNode | null, newChild: ReactNodeChildren): FiberNode | null => {
+  const reconcileChildFibers = (returnFiber: FiberNode, currentFirstChild: FiberNode | null, newChild: ReactNode): FiberNode | null => {
     isTrackSideEffects = trackSideEffects;
     if (isObject(newChild)) {
-      return reconcileSingleElementChild(returnFiber, currentFirstChild, newChild as ReactNode)
+      return reconcileSingleElementChild(returnFiber, currentFirstChild, newChild as ReactElement)
     } else if (isArray(newChild)) {
-      return reconcileChildrenArray(returnFiber, currentFirstChild, newChild as ReactNodeChild[]);
+      return reconcileChildrenArray(returnFiber, currentFirstChild, newChild as ReactNode[]);
     } else if (isText(newChild)) {
       return reconcileSingleTextChild(returnFiber, currentFirstChild, `${newChild}` as string);
     }
