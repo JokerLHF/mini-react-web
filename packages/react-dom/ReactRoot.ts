@@ -3,7 +3,7 @@ import { ReactFiberTag } from "../react-reconciler/interface/fiber";
 import { FiberNode } from "../react-reconciler/ReactFiber"
 import { scheduleUpdateOnFiber } from "../react-reconciler/ReactFiberWorkLoop";
 import { createUpdate, enqueueUpdate, initializeUpdateQueue } from "../react-reconciler/ReactUpdateQueue";
-import { ReactNode } from "../react/interface"
+import { ReactElement } from "../react/interface"
 
 export class ReactRoot {
   current: FiberNode;
@@ -22,7 +22,7 @@ export class ReactRoot {
     (window as any).ReactRootFiber = this.current;
   }
 
-  render = (element: ReactNode) => {
+  render = (element: ReactElement) => {
     const expirationTime = performance.now();
     const update = createUpdate(expirationTime);
     update.payload = { element };

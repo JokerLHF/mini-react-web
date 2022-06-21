@@ -1,4 +1,4 @@
-import { ReactNodeProps } from "../react/interface";
+import { ReactElementProps } from "../react/interface";
 
 export const isFunction = (value: any) => {
   return Object.prototype.toString.call(value) === '[object Function]';
@@ -36,6 +36,6 @@ export const isText = (children: any) => {
   return isNumber(children) || isString(children) || isBoolean(children)
 }
 
-export const shouldSetTextContent = (props: ReactNodeProps) => {
+export const shouldSetTextContent = (props: ReactElementProps) => {
   return isText(props.children);
 }

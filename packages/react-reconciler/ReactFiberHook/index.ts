@@ -1,4 +1,4 @@
-import { ReactNodeProps } from "../../react/interface"
+import { ReactElementProps } from "../../react/interface"
 import { ReactCurrentDispatcher } from "../../react/ReactHook"
 import { FunctionComponent } from "./../interface/fiber"
 import { Dispatcher, Hook, } from "../interface/hook"
@@ -108,7 +108,7 @@ const HooksDispatcherOnMount: Dispatcher = {
   useCallback: mountCallback,
 }
 
-export const renderWithHooks = (current: FiberNode | null, workInProgress: FiberNode, ComponentFunc: FunctionComponent, props: ReactNodeProps) => {
+export const renderWithHooks = (current: FiberNode | null, workInProgress: FiberNode, ComponentFunc: FunctionComponent, props: ReactElementProps) => {
   currentlyRenderingFiber = workInProgress;
   // 重置数据：update时 重新复制 hook， mount 新建 hook
   workInProgress.memoizedState = null;

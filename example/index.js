@@ -2,17 +2,9 @@ import { React, ReactDOM } from '../packages';
 
 const { useState, useEffect, useLayoutEffect, useCallback } = React;
 
-function Children2() {
-  return (
-    <div>children2</div>
-  )
-}
 function Children1() {
   return (
-    <div>
-      children1
-      <Children2 />
-    </div>
+    <div>children1 </div>
   )
 }
 
@@ -70,4 +62,40 @@ function App2() {
   );
 }
 
-ReactDOM.render(<App />, document.querySelector('#root'))
+function Children2() {
+  console.log('Children2-render');
+  return (
+    <div>children2</div>
+  )
+}
+
+function MyInput() {
+  const [state, updateState] = useState(1);
+
+  const handleAddState = useCallback(() => {
+    updateState(state + 1);
+    console.log('state-click', state);
+  }, [state]);
+
+  console.log('MyInput-render');
+
+  return (
+    <div>
+      <div className={`${state}`} style={{ color: 'red' }}>{state}</div>
+      <button onClick={handleAddState}> 点我state + 1 </button>
+    </div>
+  )
+}
+
+function App3() {
+  console.log('App3-render');
+
+  return(
+    <div>
+      <MyInput />
+      <Children2 />
+    </div>
+  )
+}
+
+ReactDOM.render(<App3 />, document.querySelector('#root'))

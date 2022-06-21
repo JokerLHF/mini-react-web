@@ -1,12 +1,12 @@
 import { shouldTrackSideEffects } from "../index";
-import { ReactNodeChild } from "../../../react/interface";
+import { ReactNode } from "../../../react/interface";
 import { FiberNode } from "../../ReactFiber";
 import { deleteChild, deleteRemainingChildren } from "../helper/deleteChild";
 import { placeChild } from "../helper/placeChild";
 import { createChild } from "../helper/createChild";
 import { mapRemainingChildren, updateFromMap, updateSlot } from "../helper/updateChild";
 
-export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, newChildren: ReactNodeChild[]) => {
+export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, newChildren: ReactNode[]) => {
   // 遍历到的 newChild 索引
   let newIdx = 0;
   let lastPlacedIndex = 0;

@@ -1,4 +1,4 @@
-import { ReactNode } from "../../../react/interface";
+import { ReactElement } from "../../../react/interface";
 import { REACT_ELEMENT_TYPE } from "../../../shared/ReactSymbols";
 import { ReactFiberTag } from "../../interface/fiber";
 import { createFiberFromElement, createFiberFromText, FiberNode } from "../../ReactFiber";
@@ -18,7 +18,7 @@ import { placeSingleChild } from "./placeChild";
   
   // key，type相同，复用节点
   if (oldFiber && oldFiber.tag === ReactFiberTag.HostText) { // 在写 jsx 的时候文本节点是没有办法自定义 key 的。所以文本节点只能通过 tag 去判断
-    const existing = useFiberAsSingle(oldFiber, { _reactTextContent: textContent });
+    const existing = useFiberAsSingle(oldFiber,  textContent);
     existing.return = returnFiber;
     return existing;
   }
@@ -34,7 +34,7 @@ import { placeSingleChild } from "./placeChild";
  *   - key 不同，返回 null
  *   - key 相同，类型相同复用，类型不同新建
  */
- export const reuseElementFiber = (returnFiber: FiberNode, oldFiber: FiberNode | null, newChild: ReactNode) => {
+ export const reuseElementFiber = (returnFiber: FiberNode, oldFiber: FiberNode | null, newChild: ReactElement) => {
   switch(newChild.$$typeof) {
     case REACT_ELEMENT_TYPE:
       return reuseElement(returnFiber, oldFiber, newChild);
@@ -48,7 +48,7 @@ import { placeSingleChild } from "./placeChild";
  *   - key 不同，返回 null
  *   - key 相同，类型相同复用，类型不同新建
  */
- export const reuseElement = (returnFiber: FiberNode, oldFiber: FiberNode | null, element: ReactNode) => {
+ export const reuseElement = (returnFiber: FiberNode, oldFiber: FiberNode | null, element: ReactElement) => {
   // key 不同
   if (element.key !== oldFiber?.key) {
     return null;
