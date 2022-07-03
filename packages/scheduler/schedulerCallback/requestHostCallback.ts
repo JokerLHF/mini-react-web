@@ -159,3 +159,7 @@ export const getIsHostCallbackScheduled = () => {
 export const setIsHostCallbackScheduled = (scheduler: boolean) => {
   isHostCallbackScheduled = scheduler;
 }
+
+export const getIsPerformance = () => {
+  return isPerformingWork;
+}

@@ -1,7 +1,13 @@
 export interface SchedulerOptions {
   delay?: number, // 表示任务延迟多长时间开始进行调度
+  timeout?: number,
 }
 
+/**
+ * 往 scheduler 注册 callback 的时候，都需要传入优先级，
+ * scheduler 就会根据注册时间(startTime) + 优先级计算的timeout 得到过期时间（expirationTime）
+ * 等到真正执行的时候再根据 currentTime 和 expirationTime 判断是否过期了
+ */
 export type SchedulerCallback = (
   (didUserCallbackTimeout: boolean) => (null | void | SchedulerCallback)
 );

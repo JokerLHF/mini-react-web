@@ -28,10 +28,11 @@ export type Dispatcher = {
 export interface Update<A> {
   action: A,
   next: Update<A> | null,
+  expirationTime: number,
 }
 
 export interface UpdateQueue<A> {
-  pending: Update<A> | null, // 环形链表
+  pending: Update<A> | null,
   dispatch: Dispatch<A> | null,
 }
 
@@ -39,6 +40,11 @@ export type Hook = {
   memoizedState: ReactHookEffect | ReactHookCallbackMemorized | any, // 用来存储当前 hook 的值
   queue: UpdateQueue<any> | null, // 修改hook会产生update， 
   next: Hook | null,
+
+  // 遇到第一个优先级不足的 update 之前的 update 的结果值
+  baseState: any,
+  // 前一次更新优先级不足的 update 组成的列表
+  baseQueue: Update<any> | null,
 };
 
 export interface ReactHookReducer<S> {
@@ -71,7 +77,7 @@ export interface ReactHookEffect {
   create: ReactHookEffectCreate,
   destroy: ReactHookEffectDestroy,
   deps: ReactHookEffectDeps,
-  next: ReactHookEffect | null,
+  next: ReactHookEffect,
 }
 
 

@@ -1,75 +1,103 @@
 import { ReactRoot } from "../../react-dom/ReactRoot";
-import { FiberRoot } from "../interface/fiber";
-import { ReactHookEffect } from "../interface/hook";
+import { getCurrentPriorityLevel } from "../../scheduler";
+import { SchedulerPriorityLevel } from "../../scheduler/interface";
+import { flushSyncCallbackQueue, runWithPriority } from "../../scheduler/scheduleSyncCallback";
 import { FiberNode } from "../ReactFiber";
-import { commitBeforeMutationEffects } from "./commitBeforeMutationEffects";
+import { ReactExpirationTime } from "../ReactFiberExpirationTime/interface";
+import { getExecutionContext, setExecutionContext } from "../ReactFiberWorkLoop/const";
+import { getRemainingExpirationTime, markRootFinishedAtTime } from "../ReactFiberWorkLoop/helper";
+import { ReactContext } from "../ReactFiberWorkLoop/interface";
+import { commitBeforeMutationEffects, flushPassiveEffects } from "./commitBeforeMutationEffects";
 import { commitLayoutEffects } from "./commitLayoutEffects";
 import { commitMutationEffects } from "./commitMutationEffects";
+import { getRootDoesHavePassiveEffects, getRootWithPendingPassiveEffects, setPendingPassiveEffectsRenderPriority, setRootDoesHavePassiveEffects, setRootWithPendingPassiveEffects } from "./const";
 
-/**
- * 在React中commitWork中大部分逻辑是杂糅在 workLoop 中的，我将他们抽离到commitWork
- * 为了逻辑抽离这里写成公共全局变量
- */
-interface IGlobalCommitRootVariables {
-  pendingPassiveHookEffectsUnMount: (ReactHookEffect | FiberNode)[],
-  pendingPassiveHookEffectsMount: (ReactHookEffect | FiberNode)[],
-  rootDoesHavePassiveEffects: boolean,
+
+// 包裹一层commitRoot，commit使用Scheduler调度
+export const commitRoot = (root: ReactRoot) => {
+  const renderPriorityLevel = getCurrentPriorityLevel();
+  runWithPriority(SchedulerPriorityLevel.ImmediateSchedulerPriority, commitRootImp.bind(null, root, renderPriorityLevel));
 }
 
-export const globalCommitRootVariables: IGlobalCommitRootVariables = {
-  pendingPassiveHookEffectsUnMount: [],
-  pendingPassiveHookEffectsMount: [],
-  rootDoesHavePassiveEffects: false,
-}
+export const commitRootImp = (root: ReactRoot) => {
+  do {
+    // syncCallback会保存在一个内部数组中，在 flushPassiveEffects 中 同步执行完
+    // 由于syncCallback的callback是 performSyncWorkOnRoot，可能产生新的 passive effect
+    // 所以需要遍历直到rootWithPendingPassiveEffects为空
+    flushPassiveEffects();
+  } while (getRootWithPendingPassiveEffects() !== null)
 
-export const commitRoot = (reactRoot: ReactRoot) => {
-  const finishedWork = reactRoot.current.alternate;
-  if (!finishedWork?.firstEffect) {
+  const finishedWork = root.current.alternate;
+  if (!finishedWork) {
     return null;
   }
+
+  const renderPriorityLevel = getCurrentPriorityLevel();
+  const expirationTime = root.finishedExpirationTime;
+
+  // 重置Scheduler相关
+  root.callbackNode = null;
+  root.callbackExpirationTime = ReactExpirationTime.NoWork;
+  root.callbackPriority = SchedulerPriorityLevel.NoSchedulerPriority;
+  root.finishedExpirationTime = ReactExpirationTime.NoWork;
+
+  // 更新root的firstPendingTime，这代表下一个要进行的任务的expirationTime
+  const remainingExpirationTimeBeforeCommit = getRemainingExpirationTime(finishedWork);
+  markRootFinishedAtTime(root, expirationTime, remainingExpirationTimeBeforeCommit);
 
   let firstEffect = finishedWork.firstEffect;
   let nextEffect: FiberNode | null = null;
 
-  // before mutation阶段
-  try {
-    commitBeforeMutationEffects(firstEffect)
-  } catch (e) {
-    console.warn('commit before mutation error', e);
-  }
+  if (firstEffect) {
+    const prevExecutionContext = getExecutionContext();
+    setExecutionContext(ReactContext.CommitContext);
 
-  // mutation阶段
-  try {
-    commitMutationEffects(firstEffect);
-  } catch(e) {
-    console.warn('commit mutation error', e);
-  }
-
-  // layout 阶段
-  try {
-    commitLayoutEffects(firstEffect);
-  } catch(e) {
-    console.warn('commit mutation error', e);
-  }
-
-  // 修改 current 树
-  reactRoot.current = finishedWork;
-
-  // ============ 渲染后: 断开effectList，方便垃圾回收 ============
-  // TODO: 这里不太明白为什么 【本次commit含有useEffect】 就不需要断开 effectList 了？？？
-  if (globalCommitRootVariables.rootDoesHavePassiveEffects) {
-    // 本次commit含有useEffect
-    globalCommitRootVariables.rootDoesHavePassiveEffects = false;
-  } else {
+    // before mutation阶段
     nextEffect = firstEffect;
-    while (nextEffect) {
-      const nextNextEffect: FiberNode | null = nextEffect.nextEffect;
-      nextEffect.nextEffect = null;
-      nextEffect = nextNextEffect;
+    try {
+      commitBeforeMutationEffects(nextEffect)
+    } catch (e) {
+      console.warn('commit before mutation error', e);
     }
+
+    // mutation阶段
+    nextEffect = firstEffect;
+    try {
+      commitMutationEffects(nextEffect);
+    } catch(e) {
+      console.warn('commit mutation error', e);
+    }
+  
+    // layout 阶段
+    nextEffect = firstEffect;
+    try {
+      commitLayoutEffects(nextEffect);
+    } catch(e) {
+      console.warn('commit mutation error', e);
+    }
+
+
+    // 本次commit含有useEffect
+    if (getRootDoesHavePassiveEffects()) {
+      setRootDoesHavePassiveEffects(false);       // 标记没有本次更新需要执行的 useEffect 了
+      setRootWithPendingPassiveEffects(root);     // 标记存在未执行的 useEffect，下一次更新之前需要先执行
+      setPendingPassiveEffectsRenderPriority(renderPriorityLevel);
+    } else {
+      // 没有 effect 直接清楚 GC，有 effect 需要等未执行的 useEffect 执行后才能 GC
+      nextEffect = firstEffect;
+      while (nextEffect) {
+        const nextNextEffect: FiberNode | null = nextEffect.nextEffect;
+        nextEffect.nextEffect = null;
+        nextEffect = nextNextEffect;
+      }
+    }
+
+    setExecutionContext(prevExecutionContext);
   }
+
+  root.current = finishedWork;
+  // useLayout 的 setState 需要同步
+  flushSyncCallbackQueue();
 }
 
-/**
- * TOThink：effect 上的 hasEffect 这个标记好像没有什么用？？？？
- */
+

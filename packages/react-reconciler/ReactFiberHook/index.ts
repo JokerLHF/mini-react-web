@@ -34,7 +34,9 @@ export const mountWorkInProgressHook = () => {
     memoizedState: null,
     queue: null,
     // 指向同一个FunctionComponent中下一个hook，构成链表
-    next: null
+    next: null,
+    baseQueue: null,
+    baseState: null,
   };
   
   if (!workInProgressHook) {
@@ -81,7 +83,9 @@ export const updateWorkInProgressHook = () => {
     const newHook = {
       memoizedState: currentHook.memoizedState,
       queue: currentHook.queue,
-      next: null
+      baseQueue: currentHook.baseQueue,
+      baseState: currentHook.baseState,
+      next: null,
     };
     if (!workInProgressHook) {
       // 这是链表中第一个hook

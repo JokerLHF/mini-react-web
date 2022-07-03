@@ -2,13 +2,13 @@ import { SchedulerSyncCallback, SchedulerPriorityLevel, SchedulerTask } from "..
 import { cancelCallback, scheduleCallback } from "../schedulerCallback";
 import { getCurrentPriorityLevel, setCurrentPriorityLevel } from "../schedulerCallback/requestHostCallback";
 
-export type FakeSchedulerTask = Record<any, any>;
+export type FakeSchedulerSyncTask = Record<any, any>;
 
 // 保存所有同步任务的队列
 let syncQueue: SchedulerSyncCallback[] | null = null;
 let immediateQueueCallbackNode: SchedulerTask | null = null;
 
-const fakeCallbackNode: FakeSchedulerTask = {};
+export const fakeCallbackNode: FakeSchedulerSyncTask = {};
 // 在执行 syncCallback 阶段
 let isFlushingSyncQueue = false;
 
@@ -32,7 +32,7 @@ export function flushSyncCallbackQueue() {
     // 如果有正在schedule的立即执行任务还未执行，取消他的schedule，立即同步执行他
     const node = immediateQueueCallbackNode;
     immediateQueueCallbackNode = null;
-    cancelSyncCallback(node);
+    cancelCallback(node);
   }
   flushSyncCallbackQueueImpl();
 }
@@ -85,11 +85,5 @@ export const runWithPriority = (priorityLevel: SchedulerPriorityLevel, eventHand
     return eventHandler();
   } finally {
     setCurrentPriorityLevel(previousPriorityLevel);
-  }
-}
-
-export const cancelSyncCallback = (callbackNode: SchedulerTask) => {
-  if (callbackNode !== fakeCallbackNode) {
-    cancelCallback(callbackNode);
   }
 }

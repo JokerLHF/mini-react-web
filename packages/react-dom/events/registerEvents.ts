@@ -1,4 +1,4 @@
-import { attemptToDispatchEvent } from "./dispatchEvents";
+import { createEventListenerWrapperWithPriority } from "./dispatchEvents";
 
 const allNativeEvents: string[] = ['click', 'dblclick'];
 const listenerSet = new Set();
@@ -34,7 +34,7 @@ const addTrappedEventListener = (
   isCapturePhaseListener: boolean,
 ) => {
   // 1. 构造listener
-  let listener = attemptToDispatchEvent.bind(
+  let listener = createEventListenerWrapperWithPriority.bind(
     null,
     domEventName,
     isCapturePhaseListener,

@@ -9,7 +9,7 @@ import { placeSingleChild } from "../helper/placeChild";
  * - update 时：直接找 oldFiber 的第一个节点，如果是文字节点就复用，如果不是就删除全部老的节点，创建新的文本节点。
  * - mount 时：新建文本节点
  */
-export const reconcileSingleTextChild = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, newChild: string) => {
+export const reconcileSingleTextChild = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, newChild: string, renderExpirationTime: number) => {
   // update 阶段
   if (currentFirstChild && currentFirstChild.tag === ReactFiberTag.HostText) { // 在写 jsx 的时候文本节点是没有办法自定义 key 的。所以文本节点只能通过 tag 去判断
     // 在旧节点中找到可以复用的节点，其他旧节点
@@ -20,7 +20,7 @@ export const reconcileSingleTextChild = (returnFiber: FiberNode,  currentFirstCh
     return placeSingleChild(existing);
   }
   // mount 阶段
-  const created = createFiberFromText(newChild);
+  const created = createFiberFromText(newChild, renderExpirationTime);
   created.return = returnFiber;
   return placeSingleChild(created);
 }

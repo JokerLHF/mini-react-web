@@ -5,14 +5,17 @@ import { ReactExpirationTime } from "../react-reconciler/ReactFiberExpirationTim
 import { scheduleUpdateOnFiber } from "../react-reconciler/ReactFiberWorkLoop";
 import { createUpdate, enqueueUpdate, initializeUpdateQueue } from "../react-reconciler/ReactUpdateQueue";
 import { SchedulerPriorityLevel, SchedulerTask } from "../scheduler/interface";
-import { FakeSchedulerTask } from "../scheduler/scheduleSyncCallback";
+import { FakeSchedulerSyncTask } from "../scheduler/scheduleSyncCallback";
 import { ReactElement } from "../react/interface"
 
 export class ReactRoot {
   current: FiberNode;
   containerInfo: HTMLElement;
-  callbackNode: SchedulerTask | FakeSchedulerTask | null;
+
+  callbackNode: SchedulerTask | FakeSchedulerSyncTask | null;
   callbackPriority: SchedulerPriorityLevel;
+  callbackExpirationTime: ReactExpirationTime;
+
   firstPendingTime: ReactExpirationTime;
   lastExpiredTime: ReactExpirationTime;
   finishedExpirationTime: ReactExpirationTime;
@@ -27,6 +30,7 @@ export class ReactRoot {
     this.callbackNode = null;
     // 保存Scheduler保存的当前正在进行的异步任务的优先级
     this.callbackPriority = SchedulerPriorityLevel.NoSchedulerPriority;
+    this.callbackExpirationTime = ReactExpirationTime.NoWork;
     // pending 指还没有commit的任务
     // 在 scheduleUpdateOnFiber--markUpdateTimeFromFiberToRoot中会更新这个值
     // 在 commitRoot--markRootFinishedAtTime中会更新这个值
@@ -42,7 +46,7 @@ export class ReactRoot {
     initializeUpdateQueue(this.current);
 
     // 方便调试
-    (window as any).ReactRootFiber = this.current;
+    (window as any).ReactRootFiber = this;
   }
 
   render = (element: ReactElement) => {
@@ -52,6 +56,6 @@ export class ReactRoot {
 
     enqueueUpdate(this.current, update);
 
-    scheduleUpdateOnFiber(this.current);
+    scheduleUpdateOnFiber(this.current, expirationTime);
   }
 }

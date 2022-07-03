@@ -1,8 +1,9 @@
 import { getCurrentTime, timeoutForPriorityLevel } from "./helper";
-import { getIsHostCallbackScheduled, requestHostCallback, setIsHostCallbackScheduled } from "./requestHostCallback";
+import { getIsHostCallbackScheduled, getIsPerformance, requestHostCallback, setIsHostCallbackScheduled } from "./requestHostCallback";
 import { cancelHostTimeout, getIsHostTimeoutScheduled, handleTimeout, requestHostTimeout, setIsHostTimeoutScheduled } from "./requestHostTimeout";
 import { SchedulerCallback, SchedulerOptions, SchedulerPriorityLevel, SchedulerTask } from "../interface";
 import { peek, push } from "../minHeap";
+import { fakeCallbackNode, FakeSchedulerSyncTask } from "../scheduleSyncCallback";
 
 let taskIdCounter = 0;
 
@@ -12,11 +13,11 @@ export const taskQueue: SchedulerTask[] = [];
 
 export const scheduleCallback = (priorityLevel: SchedulerPriorityLevel, callback: SchedulerCallback, options?: SchedulerOptions) => {
   const currentTime = getCurrentTime();
-  const { delay = 0 } = options || {};
+  const { delay = 0, timeout } = options || {};
 
   const startTime = delay > 0 ? currentTime + delay : currentTime;
-  const timeout = timeoutForPriorityLevel(priorityLevel);
-  const expirationTime = startTime + timeout;
+  const expirationTimeout = timeout || timeoutForPriorityLevel(priorityLevel);
+  const expirationTime = startTime + expirationTimeout;
 
   const newTask: SchedulerTask = {
     id: taskIdCounter++,
@@ -41,7 +42,7 @@ export const scheduleCallback = (priorityLevel: SchedulerPriorityLevel, callback
     newTask.sortIndex = expirationTime;
     // 正常任务加到 taskQueue, 并按照 sortIndex expirationTime 值越小表示越早过期排在越前 
     push(taskQueue, newTask);
-    if (!getIsHostCallbackScheduled()) {
+    if (!getIsHostCallbackScheduled() && !getIsPerformance()) {
       setIsHostCallbackScheduled(true);
       // 开始调度任务队列
       requestHostCallback();
@@ -51,6 +52,8 @@ export const scheduleCallback = (priorityLevel: SchedulerPriorityLevel, callback
   return newTask;
 }
 
-export const cancelCallback = (task: SchedulerTask) => {
-  task.callback = null;
+export const cancelCallback = (task: SchedulerTask | FakeSchedulerSyncTask) => {
+  if (task !== fakeCallbackNode) {
+    task.callback = null;
+  }
 }
