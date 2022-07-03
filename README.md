@@ -17,9 +17,14 @@
 - [x] hook 支持(useState, useEffect, useLayoutEffect, useCallback)
 - [x] key diff, 简单的 props diff
 - [x] 合成事件，react合成事件太复杂。所以自己实现了一个简单的合成事件。参考了[这里](https://7kms.github.io/react-illustration-series/main/synthetic-event)
+- [x] scheduler 任务调度
+- [x] react 更新的一些优化路径（bailout）
+- [x] react concurrent 模式（目前只跑通最简单的 setState 例子，后续需要增加高优先级插队例子验证代码是否存在 bug）
 ## TODO
-- [ ] scheduler 任务调度
-- [ ] react 更新的一些优化路径
+- [x] scheduler 任务调度
+- [x] react concurrent 模式
+- [x] react 更新的一些优化路径（bailout）
+- [ ] 增加 concurrent 模式例子，验证代码是否存在 bug
 - [ ] 输出文章
 
 
@@ -27,3 +32,4 @@
 - [react-on-the-way](https://github.com/BetaSu/react-on-the-way)
 - [图解react](https://7kms.github.io/react-illustration-series/)
 - [react工作原理](https://pomb.us/build-your-own-react/)
+- [react系列文章（强烈推荐）](https://segmentfault.com/blog/react-secret)
