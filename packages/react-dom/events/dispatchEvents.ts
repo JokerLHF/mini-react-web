@@ -1,6 +1,8 @@
 import { ReactFiberTag, ReactNormalFiberProps } from "../../react-reconciler/interface/fiber";
 import { FiberNode } from "../../react-reconciler/ReactFiber";
 import { internalInstanceKey } from "../../react-reconciler/ReactFiberCompleteWork/helper";
+import { SchedulerPriorityLevel } from "../../scheduler/interface";
+import { runWithPriority } from "../../scheduler/scheduleSyncCallback";
 import { isFunction } from "../../shared/utils";
 import { DispatchQueue, Listener } from "./interface";
 import { processDispatchQueue } from "./processEvents";
@@ -14,7 +16,23 @@ const getClosestInstanceFromNode = (nativeEvent: Node | null) => {
   return (nativeEvent as any)[internalInstanceKey]
 }
 
-export function attemptToDispatchEvent(
+export const createEventListenerWrapperWithPriority = (
+  domEventName: string,
+  isCapturePhaseListener: boolean,
+  nativeEvent: Event,
+) => {
+  return runWithPriority(
+    SchedulerPriorityLevel.UserBlockingSchedulerPriority,
+    dispatchEvent.bind(
+      null,
+      domEventName,
+      isCapturePhaseListener,
+      nativeEvent,
+    ),
+  );
+}
+
+export function dispatchEvent(
   domEventName: string,
   isCapturePhaseListener: boolean,
   nativeEvent: Event,

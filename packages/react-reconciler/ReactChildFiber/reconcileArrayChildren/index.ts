@@ -6,7 +6,7 @@ import { placeChild } from "../helper/placeChild";
 import { createChild } from "../helper/createChild";
 import { mapRemainingChildren, updateFromMap, updateSlot } from "../helper/updateChild";
 
-export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, newChildren: ReactNode[]) => {
+export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, newChildren: ReactNode[], renderExpirationTime: number) => {
   // 遍历到的 newChild 索引
   let newIdx = 0;
   let lastPlacedIndex = 0;
@@ -45,7 +45,8 @@ export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChil
      const newFiber = updateSlot(
       returnFiber,
       oldFiber,
-      newChildren[newIdx]
+      newChildren[newIdx],
+      renderExpirationTime,
     )
     
     // 2.1 key 不同复用不了直接停止第一轮循环
@@ -101,7 +102,7 @@ export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChil
       /**
        *  1. 新建 fiber 节点
        */
-      const newFiber = createChild(returnFiber, newChildren[newIdx]);
+      const newFiber = createChild(returnFiber, newChildren[newIdx], renderExpirationTime);
       if (newFiber === null) {
         continue;
       }
@@ -134,6 +135,7 @@ export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChil
       returnFiber,
       newIdx,
       newChildren[newIdx],
+      renderExpirationTime,
     );
     // 找到节点，就在 existingChildren 中删除掉该节点，
     if (newFiber) {

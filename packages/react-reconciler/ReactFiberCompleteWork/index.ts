@@ -2,12 +2,12 @@ import { ReactFiberTag } from "../interface/fiber";
 import { FiberNode } from "../ReactFiber";
 import { completeHostComponentWork } from "./completeHostComponent";
 import { completeHostTextWork } from "./completeHostText";
-import { collectEffectListToParent } from "./helper";
+import { collectEffectListToParent, resetChildExpirationTime } from "./helper";
 
 /**
  *  根据 fiber tag 类型创建 dom 节点。不会渲染到页面上，而是放在 fiber 的 stateNode 属性上
  */
- const completeWork = (current: FiberNode | null, workInProgress: FiberNode) => {
+const completeWork = (current: FiberNode | null, workInProgress: FiberNode) => {
   switch (workInProgress.tag) {
     case ReactFiberTag.HostComponent:
       return completeHostComponentWork(current, workInProgress);
@@ -39,6 +39,8 @@ export const completeUnitOfWork = (unitOfWork: FiberNode) => {
     completeWork(current, completedWork);
     // 收集 effectList 列表
     collectEffectListToParent(returnFiber, completedWork);
+    // 重置子孙节点的优先级
+    resetChildExpirationTime(completedWork);
 
     // 有兄弟节点返回兄弟节点，继续走 beginWork 逻辑。因为有可能兄弟节点还存在子节点，需要继续为子节点创建fiber节点 
     if (sibling) {

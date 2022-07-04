@@ -10,7 +10,7 @@ import { placeSingleChild } from "./placeChild";
  *   - key 不同，返回 null
  *   - key 相同，类型相同复用，类型不同新建
  */
- export const reuseTextFiber = (returnFiber: FiberNode, oldFiber: FiberNode | null, textContent: string) => {
+ export const reuseTextFiber = (returnFiber: FiberNode, oldFiber: FiberNode | null, textContent: string, renderExpirationTime: number) => {
   // 文本节点是没有 key 的，如果之前的 fiber 节点存在 key 就证明之前 oldFiber 不是文本节点，但是现在是文本节点 无法复用
   if (oldFiber?.key !== null) {
     return null;
@@ -24,7 +24,7 @@ import { placeSingleChild } from "./placeChild";
   }
 
   // key相同，type不同，新建节点
-  const created = createFiberFromText(textContent);
+  const created = createFiberFromText(textContent, renderExpirationTime);
   created.return = returnFiber;
   return placeSingleChild(created);
 }
@@ -34,10 +34,10 @@ import { placeSingleChild } from "./placeChild";
  *   - key 不同，返回 null
  *   - key 相同，类型相同复用，类型不同新建
  */
- export const reuseElementFiber = (returnFiber: FiberNode, oldFiber: FiberNode | null, newChild: ReactElement) => {
+ export const reuseElementFiber = (returnFiber: FiberNode, oldFiber: FiberNode | null, newChild: ReactElement, renderExpirationTime: number) => {
   switch(newChild.$$typeof) {
     case REACT_ELEMENT_TYPE:
-      return reuseElement(returnFiber, oldFiber, newChild);
+      return reuseElement(returnFiber, oldFiber, newChild, renderExpirationTime);
     default:
       return null;
   }
@@ -48,7 +48,7 @@ import { placeSingleChild } from "./placeChild";
  *   - key 不同，返回 null
  *   - key 相同，类型相同复用，类型不同新建
  */
- export const reuseElement = (returnFiber: FiberNode, oldFiber: FiberNode | null, element: ReactElement) => {
+export const reuseElement = (returnFiber: FiberNode, oldFiber: FiberNode | null, element: ReactElement, renderExpirationTime: number) => {
   // key 不同
   if (element.key !== oldFiber?.key) {
     return null;
@@ -60,7 +60,7 @@ import { placeSingleChild } from "./placeChild";
     return existing;
   }
   // key相同，type不同，新建节点
-  const created = createFiberFromElement(element);
+  const created = createFiberFromElement(element, renderExpirationTime);
   created.return = returnFiber;
   return created;
 }

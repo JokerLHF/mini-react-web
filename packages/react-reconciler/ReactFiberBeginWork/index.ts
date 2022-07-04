@@ -1,10 +1,13 @@
 import { ReactNode } from "../../react/interface";
+import { SchedulerPriorityLevel } from "../../scheduler/interface";
 import { FunctionComponent, ReactFiberTag } from "../interface/fiber";
 import { mountChildFibers, reconcileChildFibers } from "../ReactChildFiber";
 import { FiberNode } from "../ReactFiber";
+import { ReactExpirationTime } from "../ReactFiberExpirationTime/interface";
 import { renderWithHooks } from "../ReactFiberHook";
+import { getRenderExpirationTime } from "../ReactFiberWorkLoop/const";
 import { processUpdateQueue } from "../ReactUpdateQueue";
-import { bailoutOnAlreadyFinishedWork } from "./helper";
+import { bailoutHooks, bailoutOnAlreadyFinishedWork } from "./helper";
 
 // 针对没有update需要更新（没有或者优先级不够）的优化路径
 let didReceiveUpdate = false;
@@ -14,17 +17,17 @@ export const markWorkInProgressReceivedUpdate = () => {
   didReceiveUpdate = true;
 }
 
-const reconcileChildren = (current: FiberNode | null, workInProgress: FiberNode, nextChildren: ReactNode) => {
+const reconcileChildren = (current: FiberNode | null, workInProgress: FiberNode, nextChildren: ReactNode, renderExpirationTime: number) => {
   // mount 阶段只有 root 节点存在 current
   // update 阶段就要看是否存在子节点
   if (current) {
-    workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren);
+    workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren, renderExpirationTime);
   } else {
-    workInProgress.child = mountChildFibers(workInProgress, null, nextChildren);
+    workInProgress.child = mountChildFibers(workInProgress, null, nextChildren, renderExpirationTime);
   }
 }
 
-const updateHostRoot = (current: FiberNode, workInProgress: FiberNode) => {
+const updateHostRoot = (current: FiberNode, workInProgress: FiberNode, renderExpirationTime: number) => {
   // 消费 hostRoot 的 update 得到最新的 state
   processUpdateQueue(workInProgress);
 
@@ -52,16 +55,16 @@ const updateHostRoot = (current: FiberNode, workInProgress: FiberNode) => {
    */
   if (prevChildren === nextChildren) {
     console.log('updateHostRoot-bailoutOnAlreadyFinishedWork');
-    return bailoutOnAlreadyFinishedWork(workInProgress);
+    return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
   }
 
   console.log('updateHostRoot-reconcileChildren');
-  reconcileChildren(current, workInProgress, nextChildren);
+  reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);
   return workInProgress.child;
 }
 
 
-const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNode) => {
+const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNode, renderExpirationTime: number) => {
   const nextProps = workInProgress.pendingProps;
 
   // 排除掉 null 和 textContent 情况，hostComponent 的 props 只能是对象
@@ -72,14 +75,14 @@ const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNod
 
   let nextChildren = nextProps.children;
 
-  reconcileChildren(current, workInProgress, nextChildren);
+  reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);
   return workInProgress.child;
 }
 
 /**
  * 对于 FunctionComponent fiber 来说，需要执行获取 children
  */
-const updateFunctionComponent = (current: FiberNode | null, workInProgress: FiberNode) => {
+const updateFunctionComponent = (current: FiberNode | null, workInProgress: FiberNode, renderExpirationTime: number) => {
   const { pendingProps, type } = workInProgress;
 
   // 排除掉 null 和 textContent 情况，functionComponent 的 props 只能是对象
@@ -98,12 +101,12 @@ const updateFunctionComponent = (current: FiberNode | null, workInProgress: Fibe
    */
   if (current && !didReceiveUpdate) {
     console.log('updateFunctionComponent-bailoutOnAlreadyFinishedWork', workInProgress);
-    // TODO：这里少了一个 bailoutHook
-    return bailoutOnAlreadyFinishedWork(workInProgress);
+    bailoutHooks(current, workInProgress, renderExpirationTime)
+    return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
   }
 
   console.log('updateFunctionComponent-reconcileChildren', workInProgress);
-  reconcileChildren(current, workInProgress, children);
+  reconcileChildren(current, workInProgress, children, renderExpirationTime);
   return workInProgress.child;
 }
 
@@ -111,16 +114,19 @@ const updateFunctionComponent = (current: FiberNode | null, workInProgress: Fibe
  * beginWork 的任务就是将 workInprogress 的子节点变为 fiber 节点。
  */
 export const beginWork = (current: FiberNode | null, workInProgress: FiberNode): FiberNode | null => {
+  const updateExpirationTime = workInProgress.expirationTime;
+  const renderExpirationTime = getRenderExpirationTime();
+
   // update时，可以复用current（即上一次更新的Fiber节点）
   if (current) {
     const oldProps = current.pendingProps;
     const newProps = workInProgress.pendingProps;
-
-    // render 前根据 props 是否全等标记是否更新
-
-    // TODO: 根据 expirationTime 做优化
     if (oldProps !== newProps) {
       didReceiveUpdate = true;
+    } else if (updateExpirationTime < renderExpirationTime) {
+      // 当前fiber的优先级比较低, 就不需要调度
+      didReceiveUpdate = false;
+      return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
     } else {
       didReceiveUpdate = false;
     }
@@ -128,15 +134,16 @@ export const beginWork = (current: FiberNode | null, workInProgress: FiberNode):
     didReceiveUpdate = false;
   }
 
+  workInProgress.expirationTime = ReactExpirationTime.NoWork;
   // mount时：根据tag不同，创建不同的子Fiber节点
   switch (workInProgress.tag) {
     case ReactFiberTag.HostRoot:
       // hostRoot 的 current 肯定存在
-      return updateHostRoot(current!, workInProgress);
+      return updateHostRoot(current!, workInProgress, renderExpirationTime);
     case ReactFiberTag.HostComponent:
-      return updateHostComponent(current, workInProgress);
+      return updateHostComponent(current, workInProgress, renderExpirationTime);
     case ReactFiberTag.FunctionComponent:
-      return updateFunctionComponent(current, workInProgress);
+      return updateFunctionComponent(current, workInProgress, renderExpirationTime);
     case ReactFiberTag.HostText: // 文本节点不可能有子节点，直接返回null
     default:
       return null;

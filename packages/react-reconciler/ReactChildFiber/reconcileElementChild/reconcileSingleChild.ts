@@ -9,7 +9,7 @@ import { useFiberAsSingle } from "../helper/cloneChild";
  *   - 新节点：element
  * - mount阶段：根据【新节点】创建 fiber
  */
-export const reconcileSingleElement = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, element: ReactElement) => {
+export const reconcileSingleElement = (returnFiber: FiberNode,  currentFirstChild: FiberNode | null, element: ReactElement, renderExpirationTime: number) => {
   let oldFiber = currentFirstChild;
   const key = element.key;
   // update 阶段
@@ -50,7 +50,7 @@ export const reconcileSingleElement = (returnFiber: FiberNode,  currentFirstChil
   }
 
   // mount 阶段
-  const created = createFiberFromElement(element);
+  const created = createFiberFromElement(element, renderExpirationTime);
   created.return = returnFiber;
   return created;
 }

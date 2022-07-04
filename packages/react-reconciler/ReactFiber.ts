@@ -1,5 +1,6 @@
 import { ReactElement, ReactElementKey } from "../react/interface";
 import { ReactFiberMemoizedState, ReactFiberProps, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
+import { ReactExpirationTime } from "./ReactFiberExpirationTime/interface";
 
 export class FiberNode {
   tag: ReactFiberTag;
@@ -21,6 +22,9 @@ export class FiberNode {
   lastEffect: FiberNode | null;
   nextEffect: FiberNode | null;
   index: number;
+
+  expirationTime: ReactExpirationTime;
+  childExpirationTime: ReactExpirationTime;
 
   constructor(tag: ReactFiberTag, pendingProps: ReactFiberProps = null, key: ReactElementKey = null) {
 
@@ -59,6 +63,13 @@ export class FiberNode {
     this.firstEffect = null;
     this.lastEffect = null;
     this.nextEffect = null;
+
+
+    /**
+     * 过期时间（优先级）
+     */
+    this.expirationTime = ReactExpirationTime.NoWork;
+    this.childExpirationTime = ReactExpirationTime.NoWork;
   }
 }
 
@@ -109,18 +120,24 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: ReactFibe
   workInProgress.sibling = current.sibling;
   workInProgress.updateQueue = current.updateQueue;
   workInProgress.memoizedState = current.memoizedState;
+
+  workInProgress.expirationTime = current.expirationTime;
+  workInProgress.childExpirationTime = current.childExpirationTime;
+
   return workInProgress;
 }
 
-export const createFiberFromElement = (element: ReactElement) => {
+export const createFiberFromElement = (element: ReactElement, renderExpirationTime: number) => {
   const { type, key, props } = element;
   const tag = typeof type === 'function' ? ReactFiberTag.FunctionComponent : ReactFiberTag.HostComponent;
   const fiber = new FiberNode(tag, props, key);
+  fiber.expirationTime = renderExpirationTime;
   fiber.type = type;
   return fiber;
 }
 
-export const createFiberFromText = (textContent: string) => {
+export const createFiberFromText = (textContent: string, renderExpirationTime: number) => {
   const fiber = new FiberNode(ReactFiberTag.HostText, textContent);
+  fiber.expirationTime = renderExpirationTime;
   return fiber;
 }

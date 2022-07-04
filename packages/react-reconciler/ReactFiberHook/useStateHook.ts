@@ -2,13 +2,18 @@ import { mountWorkInProgressHook, getCurrentlyRenderingFiber, getCurrentHook, up
 import { BasicStateAction, Dispatch, Hook, ReactHookReducer, Update, UpdateQueue } from "../interface/hook";
 import { FiberNode } from "../ReactFiber";
 import { scheduleUpdateOnFiber } from "../ReactFiberWorkLoop";
+import { getRenderExpirationTime } from "../ReactFiberWorkLoop/const";
 import { markWorkInProgressReceivedUpdate } from "../ReactFiberBeginWork";
-
+import { computeExpirationForFiber, requestCurrentTimeForUpdate } from "../ReactFiberExpirationTime/updateExpirationTime";
 
 export const dispatchAction = <A>(fiber: FiberNode, queue: UpdateQueue<A>, action: A) => {
+  const currentTime = requestCurrentTimeForUpdate();
+  var expirationTime = computeExpirationForFiber(currentTime);
+
   const update: Update<A> = {
     action,
     next: null,
+    expirationTime,
   };
 
   /** 这里的逻辑跟 fiberUpdate 一样
@@ -40,7 +45,7 @@ export const dispatchAction = <A>(fiber: FiberNode, queue: UpdateQueue<A>, actio
   queue.pending = update;
 
   // 走更新流程
-  scheduleUpdateOnFiber(fiber);
+  scheduleUpdateOnFiber(fiber, expirationTime);
 }
 
 export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>>] => {
@@ -61,29 +66,103 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
  * 在 mount 阶段 useState 返回 dispatch，调用 dispatch 会往 updateQueue 增加记录，随后重新走 scheduleUpdateOnFiber
  * 此时再执行到这里已经是 update 阶段，需要执行 updateQueue 的获取最新的 state 
  */
- const updateReducer = <S, A>(
+const updateReducer = <S, A>(
   reducer: ReactHookReducer<S>,
 ): [S, Dispatch<BasicStateAction<S>>] => {
+  const workInprogressFiber = getCurrentlyRenderingFiber()!;
   const hook = updateWorkInProgressHook() as Hook;
-  const queue = hook.queue!;
-  let baseQueue: Update<any> | null = null;
+  const updateQueue = hook.queue!;
 
-  if (queue.pending) {
-    baseQueue = queue.pending;
-    queue.pending = null;
+  const pendingQueue = updateQueue.pending;
+  let baseQueue = hook.baseQueue;
+  if (pendingQueue) {
+    // 1. 将 pendingUpdate 拼入 baseUpdate 组成新的环形链表
+    if (baseQueue) {
+      // pendingQueue 尾巴接上 baseQueue 的头部     
+      const baseFirst = baseQueue.next;
+      pendingQueue.next = baseFirst;
+      // baseQueue 尾巴接上 pendingQueue 的头部     
+      const pendingFirst = pendingQueue.next;
+      baseQueue.next = pendingFirst;
+    }
+    hook.baseQueue = baseQueue = pendingQueue;
+    updateQueue.pending = null;
   }
 
   if (baseQueue) {
+    /**
+     * newState 是对应 fiber 的值：是通过执行 update 列表中属于本次优先级的 update 得到的结果
+     * baseState 是对应 hook 的值：是遇到第一个优先级不足的 update 之前的 update 的结果值
+     * 因为 update 存在优先级, 一些低优先级会被跳过：
+     * 为了用户尽快可以看到结果所以有了 newState，但是为了保证 update 的执行顺序有了 baseState
+     * https://segmentfault.com/a/1190000039008910
+     */
     let newState = getCurrentHook()?.memoizedState;
+    let newBaseState = null;
+
+    /**
+     * 保存新的优先级不足的 update 列表
+     */
+    let newBaseQueueFirst: Update<any> | null = null;
+    let newBaseQueueLast: Update<any> | null = null;
+
     // baseQueue 是一个环形链表，越往有的update时间越完，此时的 baseQueue.next 就是一个进来的 update
-    let first = baseQueue.next;
-    let update = first;
+    let first = baseQueue.next!;
+    let update: Update<any> | null = first;
 
     do {
-      const action = (update as Update<any>).action;
-      newState = reducer(newState, action);
-      update = (update as Update<any>).next;
+      const updateExpirationTime = update.expirationTime;
+      // 优先级不足
+      if (updateExpirationTime < getRenderExpirationTime()) {
+        const clone = {
+          next: null,
+          action: update.action,
+          expirationTime: updateExpirationTime,
+        }
+
+        // 拼接新的 baseQueue
+        if (newBaseQueueLast === null) {
+          newBaseQueueFirst = newBaseQueueLast = clone;
+          newBaseState = newState;
+        } else {
+          newBaseQueueLast = (newBaseQueueLast  as Update<any>).next = clone;
+        } 
+
+        // 拿到优先级最高的 expirationTime
+        if (updateExpirationTime > workInprogressFiber.expirationTime) {
+          workInprogressFiber.expirationTime = updateExpirationTime;
+        }
+      } else {
+        if (newBaseQueueLast) {
+          /**
+           * 进到这个判断说明现在处理的这个update在优先级不足的update之后，
+           * 原因有二：
+           * 第一，优先级足够；
+           * 第二，newLastBaseState不为null说明已经有优先级不足的update了
+           * 然后将这个高优先级放入本次的baseUpdate，实现之前提到的从updateQueue中
+           * 截取低优先级update到最后一个update
+           */
+           const clone = {
+            next: null,
+            action: update.action,
+            expirationTime: updateExpirationTime,
+          };
+          newBaseQueueLast = (newBaseQueueLast  as Update<any>).next = clone;
+        }
+        const action = (update as Update<any>).action;
+        newState = reducer(newState, action);
+      }
+
+      update = update.next;
     } while(update && update !== first);
+
+    // 等于 null 就代表没有低优先级的 update
+    // 不等于 null 带有有低优先级，需要将 baseQueue 变为环形链表
+    if (newBaseQueueLast === null) {
+      newBaseState = newState;
+    } else {
+      newBaseQueueLast.next = newBaseQueueFirst;
+    }
 
     /**
      * 执行 updateQueue 得到的 update 与原来的 state 值做对比判断是否需要更新。
@@ -97,9 +176,11 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
     }
   
     hook.memoizedState = newState;
+    hook.baseState = newBaseState;
+    hook.baseQueue = newBaseQueueLast;
   }
 
-  const dispatch = queue.dispatch!;
+  const dispatch = updateQueue.dispatch!;
   return [hook.memoizedState, dispatch];
 }
 

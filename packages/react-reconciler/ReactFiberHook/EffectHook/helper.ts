@@ -13,13 +13,14 @@ const createFunctionComponentUpdateQueue = (): ReactFiberFunctionComponentUpdate
  */
 const pushEffect = (tag: ReactHookEffectFlags, create: ReactHookEffectCreate, destroy: ReactHookEffectDestroy, deps: ReactHookEffectDeps) => {
   const currentlyRenderingFiber = getCurrentlyRenderingFiber()!;
-  const effect: ReactHookEffect = {
+  const effect = {
     tag,
     create,
     destroy,
     deps,
+    // effect 环形链表，所以 next 是不可能为 null 的, 这里初始化先设置为 null
     next: null,
-  }
+  } as unknown as ReactHookEffect;
 
   let componentUpdateQueue = currentlyRenderingFiber.updateQueue as ReactFiberFunctionComponentUpdateQueue;
   if (!componentUpdateQueue) {

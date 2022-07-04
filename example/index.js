@@ -98,4 +98,4 @@ function App3() {
   )
 }
 
-ReactDOM.render(<App3 />, document.querySelector('#root'))
+ReactDOM.render(<App />, document.querySelector('#root'))
