@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 500px;
+}
+
+.state-container {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  overflow: auto;
+  border: 1px black solid;
+}
+
+.drag-container {
+  display: flex;
+  position: relative;
+  flex: 1;
+  border: 1px black solid;
+}
+
+.drag-container .drag-element {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: #ccc;
+}
+
+.btn {
+  display: none;
+}

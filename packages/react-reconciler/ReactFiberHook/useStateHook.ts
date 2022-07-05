@@ -97,7 +97,7 @@ const updateReducer = <S, A>(
      * 为了用户尽快可以看到结果所以有了 newState，但是为了保证 update 的执行顺序有了 baseState
      * https://segmentfault.com/a/1190000039008910
      */
-    let newState = getCurrentHook()?.memoizedState;
+    let newState = getCurrentHook()?.baseState;
     let newBaseState = null;
 
     /**

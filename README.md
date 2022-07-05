@@ -19,12 +19,12 @@
 - [x] 合成事件，react合成事件太复杂。所以自己实现了一个简单的合成事件。参考了[这里](https://7kms.github.io/react-illustration-series/main/synthetic-event)
 - [x] scheduler 任务调度
 - [x] react 更新的一些优化路径（bailout）
-- [x] react concurrent 模式（目前只跑通最简单的 setState 例子，后续需要增加高优先级插队例子验证代码是否存在 bug）
+- [x] react concurrent 模式（简单的优先级插队以及饥饿现象）
 ## TODO
 - [x] scheduler 任务调度
 - [x] react concurrent 模式
 - [x] react 更新的一些优化路径（bailout）
-- [ ] 增加 concurrent 模式例子，验证代码是否存在 bug
+- [x] 增加 concurrent 模式例子，验证代码是否存在 bug
 - [ ] 输出文章
 
 

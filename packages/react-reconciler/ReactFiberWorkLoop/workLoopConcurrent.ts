@@ -63,6 +63,7 @@ export const performConcurrentWorkOnRoot = (root: ReactRoot, didUserCallbackTime
         break;
       } catch(e) {
         console.error('concurrent render error', e);
+        throw e;
       }
     } while (true)
 
