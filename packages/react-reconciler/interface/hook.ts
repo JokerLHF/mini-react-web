@@ -13,6 +13,7 @@ export type Dispatcher = {
     callback: ReactHookCallback,
     deps?: ReactHookCallbackDeps,
   ): void,
+  useRef<T>(initialValue: T): ReactHookRef<T>,
 }
 
 /**
@@ -37,7 +38,7 @@ export interface UpdateQueue<A> {
 }
 
 export type Hook = {
-  memoizedState: ReactHookEffect | ReactHookCallbackMemorized | any, // 用来存储当前 hook 的值
+  memoizedState: ReactHookEffect | ReactHookCallbackMemorized | any, // 用来存储当前 hook 的值, useState 和 useRef 都是 any
   queue: UpdateQueue<any> | null, // 修改hook会产生update， 
   next: Hook | null,
 
@@ -64,11 +65,13 @@ export type Dispatch<A> = (newState: A) => void;
  * useEffect(() => { return () => {} }, [xxx])
  */
 export enum ReactHookEffectFlags {
-  NoEffect = 0b000,  
-  HasEffect = 0b001, // 代表是否需要触发effect
-  Layout = 0b010,    // useLayoutEffect 的标记
-  Passive = 0b100,   // useEffect 的标记
-}
+  NoEffect = 0b000000000000000000,  
+  HasEffect = 0b000000000000000010, // 代表是否需要触发effect
+  Layout = 0b00000000000000100,    // useLayoutEffect 的标记
+  Passive = 0b000000000000001000,   // useEffect 的标记
+  Ref = 0b000000000000010000, // useRef 的标记
+};
+
 export type ReactHookEffectCreate = () => ReactHookEffectDestroy;
 export type ReactHookEffectDestroy = (() => void) | void;
 export type ReactHookEffectDeps = any[] | null;
@@ -86,4 +89,13 @@ export interface ReactHookEffect {
  */
 export type ReactHookCallbackDeps = any[] | null;
 export type ReactHookCallback = () => void;
-export type ReactHookCallbackMemorized = [ReactHookCallback, ReactHookCallbackDeps]
+export type ReactHookCallbackMemorized = [ReactHookCallback, ReactHookCallbackDeps];
+
+
+/**
+ * const ref = useRef()
+ */
+
+export interface ReactHookRef<T> {
+  current: T,
+}

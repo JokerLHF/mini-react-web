@@ -17,7 +17,7 @@ export const createChild = (returnFiber: FiberNode, newChild: ReactNode, renderE
 /**
  * 根据 object 类型创建对应的 fiber
  */
- export const createElementFiber = (returnFiber: FiberNode, newChild: ReactElement, renderExpirationTime: number) => {
+export const createElementFiber = (returnFiber: FiberNode, newChild: ReactElement, renderExpirationTime: number) => {
   switch(newChild.$$typeof) {
     case REACT_ELEMENT_TYPE:
       const created = createFiberFromElement(newChild, renderExpirationTime);

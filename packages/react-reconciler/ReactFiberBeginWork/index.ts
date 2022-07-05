@@ -1,10 +1,10 @@
 import { ReactNode } from "../../react/interface";
-import { SchedulerPriorityLevel } from "../../scheduler/interface";
 import { FunctionComponent, ReactFiberTag } from "../interface/fiber";
 import { mountChildFibers, reconcileChildFibers } from "../ReactChildFiber";
 import { FiberNode } from "../ReactFiber";
 import { ReactExpirationTime } from "../ReactFiberExpirationTime/interface";
 import { renderWithHooks } from "../ReactFiberHook";
+import { markRef } from "../ReactFiberHook/useRef";
 import { getRenderExpirationTime } from "../ReactFiberWorkLoop/const";
 import { processUpdateQueue } from "../ReactUpdateQueue";
 import { bailoutHooks, bailoutOnAlreadyFinishedWork } from "./helper";
@@ -75,6 +75,7 @@ const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNod
 
   let nextChildren = nextProps.children;
 
+  markRef(current, workInProgress);
   reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);
   return workInProgress.child;
 }

@@ -1,5 +1,5 @@
 import { ReactRoot } from "../../../react-dom/ReactRoot";
-import { ReactFiberTag } from "../../interface/fiber";
+import { ReactFiberFunctionComponentUpdateQueue, ReactFiberTag } from "../../interface/fiber";
 import { FiberNode } from "../../ReactFiber"
 
 /**
@@ -16,31 +16,54 @@ export const commitDelete = (finishedWork: FiberNode) => {
   unmountHostComponents(finishedWork);
 }
 
-const commitUnmount = () => {
-  console.log('unMount');
-  // TODO
+const commitUnmount = (node: FiberNode) => {
+  const { tag } = node;
+  switch(tag) {
+    case ReactFiberTag.FunctionComponent:
+      // 销毁 fiber 上 useEffect, useLayout 的 destroy
+      const updateQueue = node.updateQueue as ReactFiberFunctionComponentUpdateQueue;
+      let lastEffect = updateQueue ? updateQueue.lastEffect : null;
+      if (lastEffect) {
+        const firstEffect = lastEffect.next!;
+        let effect = firstEffect;
+        do {
+          effect.destroy = effect.create();
+          effect = effect.next!;
+        } while(effect !== firstEffect);
+      }
+      break;
+    default:
+      break;
+  }
 }
 
 /**
  * 递归子节点，对每一个节点进行 unmount，再一直往上到当前节点
+ *       div
+ *   /    |    \    
+ * div  com2   com3      
+ *  ｜        /   ｜  \
+ * comp      span com4 div
+ *                |    ｜
+ *                22   33
  */
 const commitNestedUnmounts = (root: FiberNode) => {
   let node = root;
   while(true) {
-    commitUnmount();
-    // 递归子节点
+    commitUnmount(node);
+    // 1. 递归子节点
     if (node.child) {
       node.child.return = node;
       node = node.child;
       continue;
     }
 
-    // node 没有 child 的时候
+    // 4. node 没有 child 的时候
     if (node === root) {
       return;
     }
 
-    // 子节点递归完，没有兄弟节点返回父节点
+    // 3. 子节点递归完，没有兄弟节点返回父节点
     while(!node.sibling) {
       if (!node.return || node.return === root) {
         return;
@@ -48,7 +71,7 @@ const commitNestedUnmounts = (root: FiberNode) => {
       node = node.return;
     }
   
-    // 子节点递归完，有兄弟节点返回兄弟节点
+    // 2. 子节点递归完，有兄弟节点返回兄弟节点
     node.sibling.return = node;
     node = node.sibling;
   }
@@ -75,6 +98,15 @@ const findParent = (node: FiberNode) => {
   return currentParent;
 }
 
+/**
+ *       div
+ *   /    |    \    
+ * com1  com2   com3      
+ *  ｜        /   ｜  \
+ * div      span com4 div
+ *                |    ｜
+ *                22   33
+ */
 const unmountHostComponents = (current: FiberNode) => {
   let node = current;
   // 当找到要删除节点的父级DOM节点，该变量置为true，这样当遍历到子节点时不会再执行寻找父级DOM节点的操作
@@ -96,8 +128,7 @@ const unmountHostComponents = (current: FiberNode) => {
         currentParent.removeChild(node.stateNode as HTMLElement | Text);
       }
     } else {
-      // 同commitNestedUnmounts一样的深度优先遍历
-      commitUnmount();
+      commitUnmount(node);
 
       if (node.child) {
         node.child.return = node;

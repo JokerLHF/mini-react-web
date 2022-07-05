@@ -25,3 +25,7 @@ export const useLayoutEffect = (create: ReactHookEffectCreate, deps?: ReactHookE
 export const useCallback = (callback: ReactHookCallback, deps?: ReactHookCallbackDeps) => {
   return ReactCurrentDispatcher.current!.useCallback(callback, deps);
 }
+
+export const useRef = <T>(initialValue: T) => {
+  return ReactCurrentDispatcher.current!.useRef(initialValue);
+}

@@ -1,5 +1,5 @@
 import { createElement } from './ReactElement';
-import { useState, useEffect, useLayoutEffect, useCallback } from './ReactHook';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from './ReactHook';
 
 const React = {
   createElement,
@@ -7,6 +7,7 @@ const React = {
   useEffect,
   useLayoutEffect,
   useCallback,
+  useRef,
 }
 
 export default React;
