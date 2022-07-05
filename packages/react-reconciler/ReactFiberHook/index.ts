@@ -7,6 +7,7 @@ import { mountState, updateState } from "./useStateHook"
 import { mountEffect, updateEffect } from "./EffectHook/useEffect"
 import { mountLayoutEffect, updateLayoutEffect } from "./EffectHook/useLayoutEffect"
 import { mountCallback, updateCallback } from "./useCallbackHook"
+import { mountRef, updateRef } from "./useRef"
 
 // 当前函数组件的 workInprogress fiber
 let currentlyRenderingFiber: FiberNode | null = null;
@@ -103,6 +104,7 @@ const HooksDispatcherOnUpdate: Dispatcher = {
   useEffect: updateEffect,
   useLayoutEffect: updateLayoutEffect,
   useCallback: updateCallback,
+  useRef: updateRef,
 }
 
 const HooksDispatcherOnMount: Dispatcher = {
@@ -110,6 +112,7 @@ const HooksDispatcherOnMount: Dispatcher = {
   useEffect: mountEffect,
   useLayoutEffect: mountLayoutEffect,
   useCallback: mountCallback,
+  useRef: mountRef,
 }
 
 export const renderWithHooks = (current: FiberNode | null, workInProgress: FiberNode, ComponentFunc: FunctionComponent, props: ReactElementProps) => {

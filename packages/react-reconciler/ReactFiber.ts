@@ -1,4 +1,4 @@
-import { ReactElement, ReactElementKey } from "../react/interface";
+import { ReactElement, ReactElementKey, ReactElementRef } from "../react/interface";
 import { ReactFiberMemoizedState, ReactFiberProps, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
 import { ReactExpirationTime } from "./ReactFiberExpirationTime/interface";
 
@@ -8,6 +8,7 @@ export class FiberNode {
   pendingProps: ReactFiberProps;
   type: ReactFiberType;
   stateNode: ReactFiberStateNode;
+  ref: ReactElementRef;
 
   return: FiberNode | null;
   child: FiberNode | null;
@@ -35,6 +36,7 @@ export class FiberNode {
     this.pendingProps = pendingProps;
     this.type = null;
     this.stateNode = null;
+    this.ref = null;
 
     // diff 默认使用用户定义的 key, 没有使用 index
     this.index = 0;
@@ -120,6 +122,7 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: ReactFibe
   workInProgress.sibling = current.sibling;
   workInProgress.updateQueue = current.updateQueue;
   workInProgress.memoizedState = current.memoizedState;
+  workInProgress.ref = current.ref;
 
   workInProgress.expirationTime = current.expirationTime;
   workInProgress.childExpirationTime = current.childExpirationTime;
@@ -133,6 +136,7 @@ export const createFiberFromElement = (element: ReactElement, renderExpirationTi
   const fiber = new FiberNode(tag, props, key);
   fiber.expirationTime = renderExpirationTime;
   fiber.type = type;
+  fiber.ref = element.ref;
   return fiber;
 }
 

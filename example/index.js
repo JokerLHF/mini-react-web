@@ -1,6 +1,6 @@
 import { React, ReactDOM } from '../packages';
 
-const { useState, useEffect, useLayoutEffect, useCallback } = React;
+const { useState, useEffect, useLayoutEffect, useCallback, useRef } = React;
 
 function Children1() {
   return (
@@ -98,4 +98,20 @@ function App3() {
   )
 }
 
-ReactDOM.render(<App />, document.querySelector('#root'))
+function RefApp() {
+  const currentRef = useRef();
+
+  useEffect(() => {
+    console.log(currentRef, 'currentRef-useEffect');
+    currentRef.current.click();
+  }, []);
+
+  const handleClick = useCallback(() => {
+    console.log('点我');
+  }, []);
+
+  return (
+    <div ref={currentRef} onClick={handleClick}>2222</div>
+  )
+}
+ReactDOM.render(<RefApp />, document.querySelector('#root'))

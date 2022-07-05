@@ -1,4 +1,5 @@
 import { FunctionComponent } from "../react-reconciler/interface/fiber";
+import { ReactHookRef } from "../react-reconciler/interface/hook";
 import { REACT_ELEMENT_TYPE } from "../shared/ReactSymbols";
 
 // 只支持标签类型 以及 函数组件(直接忽略类组件)
@@ -8,12 +9,15 @@ export type ReactElementProps = {
   [key: string]: any
 };
 
+export type ReactElementRef = ReactHookRef<any> | null;
+
 // 相当于 JSX.Element
 export interface ReactElement {
   $$typeof: typeof REACT_ELEMENT_TYPE,
   type: ReactElementType,
   key: ReactElementKey,
   props: ReactElementProps,
+  ref: ReactElementRef,
 }
 
 

@@ -1,12 +1,13 @@
 import { REACT_ELEMENT_TYPE } from '../shared/ReactSymbols';
-import { ReactElement, ReactElementKey, ReactElementProps, ReactElementType } from './interface';
+import { ReactElement, ReactElementKey, ReactElementProps, ReactElementType, ReactElementRef } from './interface';
 
-const ReactElement = (type: ReactElementType, key: ReactElementKey, props: ReactElementProps): ReactElement => {
+const createReactElement = (type: ReactElementType, key: ReactElementKey, ref: ReactElementRef, props: ReactElementProps): ReactElement => {
   return {
     $$typeof: REACT_ELEMENT_TYPE,
     type,
     key,
-    props
+    props,
+    ref,
   }
 }
 
@@ -36,11 +37,14 @@ const ReactElement = (type: ReactElementType, key: ReactElementKey, props: React
 export const createElement = (type: ReactElementType, config: ReactElementProps, ...children:  (ReactElement | string)[]) => {
   const props: ReactElementProps = config || {};
   const length = children.length;
+  let ref = props.ref || null;
+
   // 多个children使用数组的形式, 没有 children 就没有 children 字段
   if (length === 1) {
     props.children = children[0];
   } else if (length > 1) {
     props.children = children;
   }
-  return ReactElement(type, null, props)
+
+  return createReactElement(type, null, ref, props)
 }

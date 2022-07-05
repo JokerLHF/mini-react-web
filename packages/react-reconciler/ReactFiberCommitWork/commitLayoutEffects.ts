@@ -1,4 +1,4 @@
-import { ReactFiberFunctionComponentUpdateQueue } from "../interface/fiber";
+import { ReactFiberFunctionComponentUpdateQueue, ReactFiberTag } from "../interface/fiber";
 import { ReactHookEffectFlags } from "../interface/hook";
 import { FiberNode } from "../ReactFiber";
 
@@ -12,6 +12,11 @@ export const commitLayoutEffects = (nextEffect: FiberNode) => {
     // 1. 执行当前 useLayoutEffect 的 create 函数
     const layoutHookEffectTag = ReactHookEffectFlags.HasEffect | ReactHookEffectFlags.Layout;
     commitLayoutHookEffectListMount(layoutHookEffectTag, currentEffect);
+    
+    // 2. 执行 ref 的赋值, hookRef 标志在 markRef 函数中赋值，只有 HostComponent 才有 
+    if (currentEffect.effectTag & ReactHookEffectFlags.Ref) {
+      commitAttachRef(nextEffect);
+    }
     currentEffect = currentEffect.nextEffect;
   }
 }
@@ -32,5 +37,12 @@ const commitLayoutHookEffectListMount = (flags: ReactHookEffectFlags, finishedWo
       }
       effect = effect.next!;
     } while(effect !== firstEffect);
+  }
+}
+
+const commitAttachRef = (finishedWork: FiberNode) => {
+  const ref = finishedWork.ref;
+  if (ref) {
+    ref.current = finishedWork.stateNode;
   }
 }
