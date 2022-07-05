@@ -46,5 +46,5 @@ export const createElement = (type: ReactElementType, config: ReactElementProps,
     props.children = children;
   }
 
-  return createReactElement(type, null, ref, props)
+  return createReactElement(type, null, ref, props);
 }

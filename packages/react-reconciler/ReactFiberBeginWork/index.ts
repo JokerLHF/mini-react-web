@@ -54,11 +54,9 @@ const updateHostRoot = (current: FiberNode, workInProgress: FiberNode, renderExp
    *    在更新渲染的时候，prevState 和 nextState 都是一样的，所以会走 bailout
    */
   if (prevChildren === nextChildren) {
-    console.log('updateHostRoot-bailoutOnAlreadyFinishedWork');
     return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
   }
 
-  console.log('updateHostRoot-reconcileChildren');
   reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);
   return workInProgress.child;
 }
@@ -101,12 +99,10 @@ const updateFunctionComponent = (current: FiberNode | null, workInProgress: Fibe
    * 只有当 props 以及 state 都没有改变， didReceiveUpdate 才等于 false。任何一个改变了都是 true
    */
   if (current && !didReceiveUpdate) {
-    console.log('updateFunctionComponent-bailoutOnAlreadyFinishedWork', workInProgress);
     bailoutHooks(current, workInProgress, renderExpirationTime)
     return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
   }
 
-  console.log('updateFunctionComponent-reconcileChildren', workInProgress);
   reconcileChildren(current, workInProgress, children, renderExpirationTime);
   return workInProgress.child;
 }

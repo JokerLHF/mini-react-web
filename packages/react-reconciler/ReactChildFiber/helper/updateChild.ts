@@ -14,7 +14,7 @@ export const updateSlot = (returnFiber: FiberNode, oldFiber: FiberNode | null, n
   if (isText(newChild)) {
     return reuseTextFiber(returnFiber, oldFiber, newChild as string, renderExpirationTime);
   } else if (isObject(newChild)) {
-    return reuseElementFiber(returnFiber, oldFiber, newChild as ReactElement, renderExpirationTime)
+    return reuseElementFiber(returnFiber, oldFiber, newChild as ReactElement, renderExpirationTime);
   }
   return null;
 }
