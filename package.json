@@ -1,7 +1,7 @@
 {
-  "name": "mini-react",
+  "name": "mini-react-web",
   "version": "0.0.1",
-  "description": "a very simple react",
+  "description": "mini react",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.config.js --color --open"
@@ -15,7 +15,6 @@
     "babel-loader": "^8.0.5",
     "css-loader": "^5.2.7",
     "html-webpack-plugin": "^3.2.0",
-    "jest": "^27.5.1",
     "style-loader": "^2.0.0",
     "ts-jest": "^27.1.4",
     "ts-loader": "^8.1.0",

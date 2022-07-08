@@ -1,7 +1,6 @@
 import { ReactRoot } from "../../react-dom/ReactRoot";
 import { cancelCallback, getCurrentTime, scheduleCallback, scheduleSyncCallback } from "../../scheduler";
 import { SchedulerPriorityLevel } from "../../scheduler/interface";
-import { FiberRoot, ReactFiberTag } from "../interface/fiber";
 import { createWorkInProgress, FiberNode } from "../ReactFiber";
 import { beginWork } from "../ReactFiberBeginWork";
 import { completeUnitOfWork } from "../ReactFiberCompleteWork";
@@ -9,6 +8,7 @@ import { expirationTimeToMs } from "../ReactFiberExpirationTime";
 import { ReactExpirationTime } from "../ReactFiberExpirationTime/interface";
 import { inferPriorityFromExpirationTime, requestCurrentTimeForUpdate } from "../ReactFiberExpirationTime/updateExpirationTime";
 import { setRenderExpirationTime, setWorkInProgress } from "./const";
+import { getNextRootExpirationTimeToWorkOn, markUpdateTimeFromFiberToRoot } from "./helper";
 import { performConcurrentWorkOnRoot } from "./workLoopConcurrent";
 import { performSyncWorkOnRoot } from "./workLoopSync";
 
@@ -20,7 +20,6 @@ export const prepareFreshStack = (root: ReactRoot, expirationTime: number) => {
   setRenderExpirationTime(expirationTime);
 }
 
-
 export const performUnitOfWork = (unitOfWork: FiberNode) => {
   const current = unitOfWork.alternate;
   // beginWork会返回fiber.child，不存在next意味着深度优先遍历已经遍历到某个子树的最深层叶子节点
@@ -29,67 +28,6 @@ export const performUnitOfWork = (unitOfWork: FiberNode) => {
     next = completeUnitOfWork(unitOfWork);
   }
   return next;
-}
-
-const markRootUpdatedAtTime = (root: ReactRoot, expirationTime: number) => {
-  if (expirationTime > root.firstPendingTime) {
-    root.firstPendingTime = expirationTime;
-  }
-}
-
-/**
- * 1. fiber 本身加上 expirationTime
- * 2. expirationTime 向上传递到 fiberRoot
- * 3. 标记 root 的 pendingTime
- */
-const markUpdateTimeFromFiberToRoot = (fiber: FiberNode, expirationTime: number) => {
-  let root = null;
-  let node = fiber.return;
-
-  if (fiber.expirationTime < expirationTime) {
-    // 更新触发update的fiber的expirationTime
-    fiber.expirationTime = expirationTime;
-  }
-  let alternate = fiber.alternate;
-  if (alternate && alternate.expirationTime < expirationTime) {
-    // 同时更新 alternate
-    alternate.expirationTime = expirationTime;
-  }
-
-  if (!node && fiber.tag === ReactFiberTag.HostRoot) {
-    root = (fiber as FiberRoot).stateNode;
-  } else {
-    while (node) {
-      // 更新childExpirationTime
-      alternate = node.alternate;
-      if (node.childExpirationTime < expirationTime) {
-        node.childExpirationTime = expirationTime
-      } 
-      if (alternate && alternate.childExpirationTime < expirationTime) {
-        alternate.childExpirationTime = expirationTime;
-      }
-  
-      if (!node.return && node.tag === ReactFiberTag.HostRoot) {
-        root = (node as FiberRoot).stateNode;
-        break;
-      }
-      node = node.return;
-    }
-  }
-  if (root) {
-    // 标记 root 的 pendingTime
-    markRootUpdatedAtTime(root, expirationTime);
-  }
-  return root;
-}
-
-
-// 有过期任务返回过期任务，优先调度。没有就返回下一个等待调度的的任务
-const getNextRootExpirationTimeToWorkOn = (root: ReactRoot) => {
-  if (root.lastExpiredTime !== ReactExpirationTime.NoWork) {
-    return root.lastExpiredTime;
-  }
-  return root.firstPendingTime;
 }
 
 /**

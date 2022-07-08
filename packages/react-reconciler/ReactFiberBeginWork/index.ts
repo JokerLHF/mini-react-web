@@ -7,15 +7,8 @@ import { renderWithHooks } from "../ReactFiberHook";
 import { markRef } from "../ReactFiberHook/useRef";
 import { getRenderExpirationTime } from "../ReactFiberWorkLoop/const";
 import { processUpdateQueue } from "../ReactUpdateQueue";
+import { getWorkInProgressDidUpdate, setWorkInProgressDidUpdate } from "./const";
 import { bailoutHooks, bailoutOnAlreadyFinishedWork } from "./helper";
-
-// 针对没有update需要更新（没有或者优先级不够）的优化路径
-let didReceiveUpdate = false;
-
-// 当hook 计算state发现state改变时通过该函数改变didReceiveUpdate
-export const markWorkInProgressReceivedUpdate = () => {
-  didReceiveUpdate = true;
-}
 
 const reconcileChildren = (current: FiberNode | null, workInProgress: FiberNode, nextChildren: ReactNode, renderExpirationTime: number) => {
   // mount 阶段只有 root 节点存在 current
@@ -98,7 +91,7 @@ const updateFunctionComponent = (current: FiberNode | null, workInProgress: Fibe
    * 在 render 后 (renderWithHooks) 会通过执行 hook 计算 state 是否改变判断是否更新，去修改 didReceiveUpdate 的值
    * 只有当 props 以及 state 都没有改变， didReceiveUpdate 才等于 false。任何一个改变了都是 true
    */
-  if (current && !didReceiveUpdate) {
+  if (current && !getWorkInProgressDidUpdate()) {
     bailoutHooks(current, workInProgress, renderExpirationTime)
     return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
   }
@@ -119,16 +112,16 @@ export const beginWork = (current: FiberNode | null, workInProgress: FiberNode):
     const oldProps = current.pendingProps;
     const newProps = workInProgress.pendingProps;
     if (oldProps !== newProps) {
-      didReceiveUpdate = true;
+      setWorkInProgressDidUpdate(true);
     } else if (updateExpirationTime < renderExpirationTime) {
       // 当前fiber的优先级比较低, 就不需要调度
-      didReceiveUpdate = false;
+      setWorkInProgressDidUpdate(false);
       return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
     } else {
-      didReceiveUpdate = false;
+      setWorkInProgressDidUpdate(false);
     }
   } else {
-    didReceiveUpdate = false;
+    setWorkInProgressDidUpdate(false);
   }
 
   workInProgress.expirationTime = ReactExpirationTime.NoWork;

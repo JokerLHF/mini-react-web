@@ -1,7 +1,6 @@
 import { FiberNode } from "../ReactFiber";
 import { ReactContext } from "./interface";
 
-
 // 描述我们在React执行上下文的位置
 // CommitContext 会在 commitRoot 有 effect时标记
 let executionContext = ReactContext.NoContext;
@@ -29,6 +28,7 @@ export const setRenderExpirationTime = (newRenderExpirationTime: number) => {
 export const getWorkInProgress = () => {
   return workInProgress;
 }
+
 export const setWorkInProgress = (newWorkInProgress: FiberNode | null) => {
   workInProgress = newWorkInProgress;
 }

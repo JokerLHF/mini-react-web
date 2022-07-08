@@ -3,8 +3,8 @@ import { BasicStateAction, Dispatch, Hook, ReactHookReducer, Update, UpdateQueue
 import { FiberNode } from "../ReactFiber";
 import { scheduleUpdateOnFiber } from "../ReactFiberWorkLoop";
 import { getRenderExpirationTime } from "../ReactFiberWorkLoop/const";
-import { markWorkInProgressReceivedUpdate } from "../ReactFiberBeginWork";
 import { computeExpirationForFiber, requestCurrentTimeForUpdate } from "../ReactFiberExpirationTime/updateExpirationTime";
+import { setWorkInProgressDidUpdate } from "../ReactFiberBeginWork/const";
 
 export const dispatchAction = <A>(fiber: FiberNode, queue: UpdateQueue<A>, action: A) => {
   const currentTime = requestCurrentTimeForUpdate();
@@ -56,6 +56,13 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
     dispatch: null,
   };
 
+  /**
+   * 有一道常见面试题来自这里
+   *  const [state, setState] = useState();
+   *  window.setState = setState;
+   * 我在控制台输入 window.setState() UI 会不会变化
+   * 答案是会的，因为这里提前注入了 fiber 等变量，也就是说 setState 运行不需要上下文
+   */
   const dispatch: Dispatch<BasicStateAction<S>> 
     = hook.queue.dispatch
     = dispatchAction.bind(null, getCurrentlyRenderingFiber() as FiberNode, hook.queue);
@@ -172,7 +179,7 @@ const updateReducer = <S, A>(
      *    setState(1)
      */
     if (!Object.is(newState, hook.memoizedState)) {
-      markWorkInProgressReceivedUpdate();
+      setWorkInProgressDidUpdate(true);
     }
   
     hook.memoizedState = newState;
