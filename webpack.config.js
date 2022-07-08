@@ -16,11 +16,11 @@ module.exports = {
   devServer: {
     host: '0.0.0.0',
     port: 9999,
-    hot: true
+    hot: true,
   },
 
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: ['.ts', '.tsx', '.js'],
   },
 
   module: {

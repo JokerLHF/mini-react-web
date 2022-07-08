@@ -6,7 +6,6 @@ import { getExecutionContext, getRenderExpirationTime, getWorkInProgress, setExe
 import { ReactContext } from "./interface";
 import { flushPassiveEffects } from "../ReactFiberCommitWork/commitBeforeMutationEffects";
 
-
 const workLoopSync = () => {
   let workInProgress = getWorkInProgress();
   while (workInProgress) {

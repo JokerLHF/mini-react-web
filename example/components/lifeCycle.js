@@ -1,6 +1,6 @@
 import { React } from '../../packages';
 
-const { useState, useEffect, useLayoutEffect, useCallback } = React;
+const { useState, useEffect, useLayoutEffect, useCallback, useRef } = React;
 
 function Children1() {
   return (
