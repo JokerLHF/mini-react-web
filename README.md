@@ -15,7 +15,7 @@
 ## 已实现功能
 - [x] fiber 首屏渲染
 - [x] fiber 更新渲染
-- [x] hook 支持(useState, useEffect, useLayoutEffect, useCallback)
+- [x] hook 支持(useState, useEffect, useLayoutEffect, useRef, useCallback)
 - [x] key diff, 简单的 props diff
 - [x] 合成事件，react合成事件太复杂。所以自己实现了一个简单的合成事件(目前只支持了 onClick 事件)。参考了[这里](https://7kms.github.io/react-illustration-series/main/synthetic-event)
 - [x] scheduler 任务调度
@@ -27,10 +27,12 @@
 - [x] ~~react concurrent 模式~~
 - [x] ~~react 更新的一些优化路径（bailout）~~
 - [x] ~~增加 concurrent 模式例子，验证代码是否存在 bug~~
+- [ ] 输出文章
+- [ ] 完成 useMemo, memo 等API
 - [ ] 引入 eslint
 - [ ] 引入 单元测试
 - [ ] 引入 pnpm 替代 npm
-- [ ] 输出文章
+
 
 ## 学习笔记（持续更新中...）
  - [前言: 了解 react 设计](https://n1pwb3impj.feishu.cn/docx/doxcnF7jdtVE0RJZMGZmK8W2Udf)
