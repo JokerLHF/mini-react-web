@@ -21,6 +21,8 @@
 - [x] scheduler 任务调度
 - [x] react 更新的一些优化路径（bailout）
 - [x] 基于 expirationTime 的 react concurrent 模式（简单的优先级插队以及饥饿现象）。lanes 模型的 concurrent 看不懂......
+- [x] 实现简单的 renderToString
+
 
 ## TODO
 - [x] ~~scheduler 任务调度~~
@@ -36,6 +38,7 @@
 
 ## 学习笔记（持续更新中...）
  - [前言: 了解 react 设计](https://n1pwb3impj.feishu.cn/docx/doxcnF7jdtVE0RJZMGZmK8W2Udf)
+ - [了解 react 执行流程](https://n1pwb3impj.feishu.cn/docx/doxcnvaKnQyLHOc09KkY9tt43fh)
  
 ## 参考资料
 - [卡颂 react 技术揭秘](https://react.iamkasong.com/)
