@@ -39,6 +39,8 @@
 ## 学习笔记（持续更新中...）
  - [前言: 了解 react 设计](https://n1pwb3impj.feishu.cn/docx/doxcnF7jdtVE0RJZMGZmK8W2Udf)
  - [了解 react 执行流程](https://n1pwb3impj.feishu.cn/docx/doxcnvaKnQyLHOc09KkY9tt43fh)
+ - [了解 react diff 算法](https://n1pwb3impj.feishu.cn/docx/doxcn6NKeR8B3YU70oNLPiG8fme)
+ 
  
 ## 参考资料
 - [卡颂 react 技术揭秘](https://react.iamkasong.com/)
