@@ -1,7 +1,8 @@
-import { scheduleCallback, cancelCallback } from './schedulerCallback';
-import { getCurrentTime } from './schedulerCallback/helper';
-import { getCurrentPriorityLevel, shouldYieldToHost } from './schedulerCallback/requestHostCallback';
-import { scheduleSyncCallback } from './scheduleSyncCallback';
+import { SchedulerCallback, SchedulerPriorityLevel, SchedulerTask } from './src/interface';
+import { scheduleCallback, cancelCallback } from './src/schedulerCallback';
+import { getCurrentTime } from './src/schedulerCallback/helper';
+import { getCurrentPriorityLevel, shouldYieldToHost } from './src/schedulerCallback/requestHostCallback';
+import { FakeSchedulerSyncTask, flushSyncCallbackQueue, runWithPriority, scheduleSyncCallback } from './src/scheduleSyncCallback';
 
 export {
   scheduleCallback,
@@ -10,4 +11,10 @@ export {
   shouldYieldToHost,
   scheduleSyncCallback,
   getCurrentTime,
+  runWithPriority,
+  SchedulerPriorityLevel,
+  flushSyncCallbackQueue,
+  SchedulerCallback,
+  SchedulerTask,
+  FakeSchedulerSyncTask,
 }
