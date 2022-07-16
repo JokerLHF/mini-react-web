@@ -2,8 +2,9 @@
 - 基于react 17 使用 ts 实现了一个 mini-react
 
 ## 使用
-- yarn install
-- yarn start
+- cd example
+- pnpm install
+- pnpm start
 - 源代码在 packages, 跑起来的实例在 example, 修改 index.js 即可
 
 ## 说明
@@ -29,11 +30,12 @@
 - [x] ~~react concurrent 模式~~
 - [x] ~~react 更新的一些优化路径（bailout）~~
 - [x] ~~增加 concurrent 模式例子，验证代码是否存在 bug~~
+- [x] 引入 pnpm 替代 npm
 - [ ] 输出文章
 - [ ] 完成 useMemo, memo 等API
 - [ ] 引入 eslint
 - [ ] 引入 单元测试
-- [ ] 引入 pnpm 替代 npm
+
 
 
 ## 学习笔记（持续更新中...）
