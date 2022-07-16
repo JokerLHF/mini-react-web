@@ -32,14 +32,15 @@ export interface Update<A> {
   expirationTime: number,
 }
 
-export interface UpdateQueue<A> {
+export interface UpdateQueue<S, A> {
   pending: Update<A> | null,
   dispatch: Dispatch<A> | null,
+  lastRenderedReducer: ReactHookReducer<S> | null,
 }
 
 export type Hook = {
   memoizedState: ReactHookEffect | ReactHookCallbackMemorized | any, // 用来存储当前 hook 的值, useState 和 useRef 都是 any
-  queue: UpdateQueue<any> | null, // 修改hook会产生update， 
+  queue: UpdateQueue<any, any> | null, // 修改hook会产生update， 
   next: Hook | null,
 
   // 遇到第一个优先级不足的 update 之前的 update 的结果值

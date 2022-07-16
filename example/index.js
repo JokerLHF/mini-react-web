@@ -1,9 +1,9 @@
 import { React, ReactDOM } from '../packages';
 // import LifeCycle from './components/lifeCycle';
-// import Bailout from './components/bailout';
+import Bailout from './components/bailout';
 // import DiffPriority from './components/DiffPriority';
-import SchedulerTask from './components/SchedulerTask';
-import RenderToStringCom from './components/renderToString';
+// import SchedulerTask from './components/SchedulerTask';
+// import RenderToStringCom from './components/renderToString';
 
 
 function App() {
@@ -11,7 +11,7 @@ function App() {
   // return <LifeCycle />;
 
   // react 优化路径
-  // return <Bailout />;
+  return <Bailout />;
 
   // 优先级插队
   // return <DiffPriority />;
@@ -20,7 +20,7 @@ function App() {
   // return <SchedulerTask />;
 
   // renderToString
-  return <RenderToStringCom />
+  // return <RenderToStringCom />
 }
 
 ReactDOM.render(<App />, document.querySelector('#root'))

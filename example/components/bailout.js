@@ -27,6 +27,29 @@ function MyInput() {
   )
 }
 
+function UseStateBailout() {
+  const [state, setState] = useState([1]);
+
+  // setState 的值相同是不会引起 re-render 的
+  const handleClick = useCallback(() => {
+    console.log("clik");
+    const newState = state;
+    newState.push(2)
+    setState(newState);
+  }, [state]);
+
+  console.log("render", state);
+
+  return (
+    <div className="App">
+      <h1 onClick={handleClick}>点我 setState 相同的值</h1>
+      <div>
+        {state.map(item => <p>{item}</p>)}
+      </div>
+    </div>
+  );
+}
+
 export default function Bailout() {
   console.log('App3-render');
 
@@ -34,6 +57,7 @@ export default function Bailout() {
     <div>
       <MyInput />
       <Children2 />
+      <UseStateBailout />
     </div>
   )
 }
