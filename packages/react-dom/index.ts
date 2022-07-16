@@ -1,19 +1,11 @@
-import { ReactElement } from "../react/interface";
-import { listenToAllSupportedEvents } from "./events/registerEvents";
-import { ReactRoot } from "./ReactRoot";
-import { renderToString } from "./server/renderToString";
-
-export type Container = HTMLElement;
+import { render } from "./src/client";
+import { renderToString } from "./src/server/renderToString";
 
 const ReactDOM = {
-  render(element: ReactElement, container: Container) {
-    const root = new ReactRoot(container);
-    listenToAllSupportedEvents(container);
-    root.render(element);
-  },
-  server: {
-    renderToString,
-  }
+  render,
+  renderToString,
 }
 
 export default ReactDOM;
+
+export * from './src/client/ReactRoot';
