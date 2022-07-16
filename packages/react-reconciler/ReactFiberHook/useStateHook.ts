@@ -6,7 +6,12 @@ import { getRenderExpirationTime } from "../ReactFiberWorkLoop/const";
 import { computeExpirationForFiber, requestCurrentTimeForUpdate } from "../ReactFiberExpirationTime/updateExpirationTime";
 import { setWorkInProgressDidUpdate } from "../ReactFiberBeginWork/const";
 
-export const dispatchAction = <A>(fiber: FiberNode, queue: UpdateQueue<A>, action: A) => {
+/**
+ * 这里因为要拿到 hook.memoizedState，所以这里将 hook 传进来。
+ * react 做法是只传入 queue，但是 queue 没有办法拿到 hook 的数据
+ * 所以 react 在 queue 设置一个 lastReducerState 值跟 hook.memoizedState 一样。在赋值 hook.memoizedState 的时候也赋值给 lastReducerState
+ */
+export const dispatchAction = <A>(fiber: FiberNode, hook: Hook, action: A) => {
   const currentTime = requestCurrentTimeForUpdate();
   var expirationTime = computeExpirationForFiber(currentTime);
 
@@ -15,7 +20,7 @@ export const dispatchAction = <A>(fiber: FiberNode, queue: UpdateQueue<A>, actio
     next: null,
     expirationTime,
   };
-
+  const queue = hook.queue!;
   /** 这里的逻辑跟 fiberUpdate 一样
    * 1. 插入 u0, 当前pending: u0
    *   - u0 -
@@ -44,6 +49,14 @@ export const dispatchAction = <A>(fiber: FiberNode, queue: UpdateQueue<A>, actio
   }
   queue.pending = update;
 
+  const lastRenderedReducer = queue.lastRenderedReducer;
+  if (lastRenderedReducer) {
+    const currentState = hook.memoizedState;
+    const newState = lastRenderedReducer(currentState, action as any);
+    if (Object.is(currentState, newState)) {
+      return;
+    }
+  }
   // 走更新流程
   scheduleUpdateOnFiber(fiber, expirationTime);
 }
@@ -54,6 +67,7 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
   hook.queue = {
     pending: null,
     dispatch: null,
+    lastRenderedReducer: basicStateReducer,
   };
 
   /**
@@ -65,7 +79,7 @@ export const mountState = <S>(initialState: S): [S, Dispatch<BasicStateAction<S>
    */
   const dispatch: Dispatch<BasicStateAction<S>> 
     = hook.queue.dispatch
-    = dispatchAction.bind(null, getCurrentlyRenderingFiber() as FiberNode, hook.queue);
+    = dispatchAction.bind(null, getCurrentlyRenderingFiber() as FiberNode, hook);
   return [hook.memoizedState, dispatch];
 }
 
@@ -80,6 +94,7 @@ const updateReducer = <S, A>(
   const hook = updateWorkInProgressHook() as Hook;
   const updateQueue = hook.queue!;
 
+  updateQueue.lastRenderedReducer = reducer;
   const pendingQueue = updateQueue.pending;
   let baseQueue = hook.baseQueue;
   if (pendingQueue) {
