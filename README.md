@@ -30,7 +30,7 @@
 - [x] ~~react concurrent 模式~~
 - [x] ~~react 更新的一些优化路径（bailout）~~
 - [x] ~~增加 concurrent 模式例子，验证代码是否存在 bug~~
-- [x] 引入 pnpm 替代 npm
+- [x] ~~引入 pnpm 替代 npm~~
 - [ ] 输出文章
 - [ ] 完成 useMemo, memo 等API
 - [ ] 引入 eslint
