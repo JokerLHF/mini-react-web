@@ -96,6 +96,7 @@ export const reconcileChildrenArray = (returnFiber: FiberNode,  currentFirstChil
 
   /**
    * 第三轮遍历: 旧节点遍历完了，如果还存在新节点，此时应该新建新节点
+   * mount 阶段也会走这个逻辑
    */
   if (!oldFiber) {
     for (; newIdx < newChildren.length; newIdx++) {

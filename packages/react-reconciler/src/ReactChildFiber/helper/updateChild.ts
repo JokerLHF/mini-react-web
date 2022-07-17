@@ -1,7 +1,7 @@
-import { ReactElement, ReactNode } from "@mini/react";
-import { isObject, isText } from "@mini/shared";
+import { ReactElement, ReactFragment, ReactNode } from "@mini/react";
+import { isArray, isObject, isText } from "@mini/shared";
 import { FiberNode } from "../../ReactFiber";
-import { reuseElementFiber, reuseTextFiber } from "./reuseChild";
+import { reuseElementFiber, reuseFragment, reuseTextFiber } from "./reuseChild";
 
 export type remainingChildrenMap = Map<string | number, FiberNode>
 
@@ -15,6 +15,8 @@ export const updateSlot = (returnFiber: FiberNode, oldFiber: FiberNode | null, n
     return reuseTextFiber(returnFiber, oldFiber, newChild as string, renderExpirationTime);
   } else if (isObject(newChild)) {
     return reuseElementFiber(returnFiber, oldFiber, newChild as ReactElement, renderExpirationTime);
+  } else if (isArray(newChild)) {
+    return reuseFragment(returnFiber, oldFiber, newChild as ReactFragment, renderExpirationTime);
   }
   return null;
 }
@@ -49,6 +51,11 @@ export const updateFromMap = (existingChildren: remainingChildrenMap, returnFibe
     const matchedFiber = existingChildren.get(newChild.key || newIdx) || null;
     // 2. 尝试进行复用
     return reuseElementFiber(returnFiber, matchedFiber, newChild, renderExpirationTime);
+  } else if (isArray(newChild)) {
+     // 1. 根据 key || index 在 map 中找到可以复用的节点
+     const matchedFiber = existingChildren.get(newIdx) || null;
+     // 2. 尝试进行复用
+     return reuseFragment(returnFiber, matchedFiber, newChild as ReactFragment, renderExpirationTime);
   }
   return null;
 }

@@ -1,8 +1,8 @@
 import { FunctionComponent, ReactHookRef } from "@mini/react-reconciler";
-import { REACT_ELEMENT_TYPE } from "@mini/shared";
+import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from "@mini/shared";
 
 // 只支持标签类型 以及 函数组件(直接忽略类组件)
-export type ReactElementType = string | FunctionComponent; 
+export type ReactElementType = string | FunctionComponent | typeof REACT_FRAGMENT_TYPE; 
 export type ReactElementKey = string | null;
 export type ReactElementProps = {
   [key: string]: any
@@ -27,5 +27,5 @@ export interface ReactElement {
  */
 
 type ReactText = string | number;
-type ReactFragment = ReactNode[];
+export type ReactFragment = ReactNode[];
 export type ReactNode = ReactElement | ReactText | boolean | null | undefined | ReactFragment;

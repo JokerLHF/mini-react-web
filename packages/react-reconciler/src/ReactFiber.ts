@@ -1,4 +1,5 @@
-import { ReactElement, ReactElementKey, ReactElementRef } from "@mini/react";
+import { ReactElement, ReactElementKey, ReactElementRef, ReactFragment } from "@mini/react";
+import { REACT_FRAGMENT_TYPE } from "@mini/shared";
 import { ReactFiberMemoizedState, ReactFiberProps, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
 import { ReactExpirationTime } from "./ReactFiberExpirationTime/interface";
 
@@ -132,16 +133,28 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: ReactFibe
 
 export const createFiberFromElement = (element: ReactElement, renderExpirationTime: number) => {
   const { type, key, props } = element;
-  const tag = typeof type === 'function' ? ReactFiberTag.FunctionComponent : ReactFiberTag.HostComponent;
-  const fiber = new FiberNode(tag, props, key);
-  fiber.expirationTime = renderExpirationTime;
-  fiber.type = type;
-  fiber.ref = element.ref;
-  return fiber;
+  switch (type) {
+    case REACT_FRAGMENT_TYPE:
+      return createFiberFromFragment(element.props.children, renderExpirationTime);
+    default:
+      const tag = typeof type === 'function' ? ReactFiberTag.FunctionComponent : ReactFiberTag.HostComponent;
+      const fiber = new FiberNode(tag, props, key);
+      fiber.expirationTime = renderExpirationTime;
+      fiber.type = type;
+      fiber.ref = element.ref;
+      return fiber;
+  }
 }
 
 export const createFiberFromText = (textContent: string, renderExpirationTime: number) => {
   const fiber = new FiberNode(ReactFiberTag.HostText, textContent);
   fiber.expirationTime = renderExpirationTime;
+  return fiber;
+}
+
+export const createFiberFromFragment = (element: ReactFragment, renderExpirationTime: number) => {
+  const fiber = new FiberNode(ReactFiberTag.Fragment, element, null);
+  fiber.expirationTime = renderExpirationTime;
+  fiber.type = REACT_FRAGMENT_TYPE;
   return fiber;
 }

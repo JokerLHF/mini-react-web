@@ -1,7 +1,7 @@
-import { ReactElement } from "@mini/react";
-import { REACT_ELEMENT_TYPE } from "@mini/shared";
+import { ReactElement, ReactFragment } from "@mini/react";
+import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from "@mini/shared";
 import { ReactFiberTag } from "../../interface/fiber";
-import { createFiberFromElement, createFiberFromText, FiberNode } from "../../ReactFiber";
+import { createFiberFromElement, createFiberFromFragment, createFiberFromText, FiberNode } from "../../ReactFiber";
 import { useFiberAsSingle } from "./cloneChild";
 import { placeSingleChild } from "./placeChild";
 
@@ -37,22 +37,21 @@ import { placeSingleChild } from "./placeChild";
  export const reuseElementFiber = (returnFiber: FiberNode, oldFiber: FiberNode | null, newChild: ReactElement, renderExpirationTime: number) => {
   switch(newChild.$$typeof) {
     case REACT_ELEMENT_TYPE:
-      return reuseElement(returnFiber, oldFiber, newChild, renderExpirationTime);
+      // key 不同直接返回
+      if (newChild.key !== oldFiber?.key) {
+        return null;
+      }
+
+      // key 相同尝试复用
+      return oldFiber.type === REACT_FRAGMENT_TYPE
+        ? reuseFragment(returnFiber, oldFiber, (newChild as ReactElement).props.children, renderExpirationTime)
+        : reuseElement(returnFiber, oldFiber, newChild, renderExpirationTime);
     default:
       return null;
   }
 }
 
-/**
- * - react元素节点尝试复用旧节点
- *   - key 不同，返回 null
- *   - key 相同，类型相同复用，类型不同新建
- */
 export const reuseElement = (returnFiber: FiberNode, oldFiber: FiberNode | null, element: ReactElement, renderExpirationTime: number) => {
-  // key 不同
-  if (element.key !== oldFiber?.key) {
-    return null;
-  }
   // key，type相同，复用节点
   if (oldFiber && oldFiber.type === element.type) {
     const existing = useFiberAsSingle(oldFiber, element.props);
@@ -61,6 +60,19 @@ export const reuseElement = (returnFiber: FiberNode, oldFiber: FiberNode | null,
   }
   // key相同，type不同，新建节点
   const created = createFiberFromElement(element, renderExpirationTime);
+  created.return = returnFiber;
+  return created;
+}
+
+export const reuseFragment = (returnFiber: FiberNode, oldFiber: FiberNode | null, element: ReactFragment, renderExpirationTime: number) => {
+  // key，type相同，复用节点
+  if (oldFiber && oldFiber.tag === ReactFiberTag.Fragment) {
+    const existing = useFiberAsSingle(oldFiber, element);
+    existing.return = returnFiber;
+    return existing;
+  }
+  // key相同，type不同，新建节点
+  const created = createFiberFromFragment(element, renderExpirationTime);
   created.return = returnFiber;
   return created;
 }

@@ -122,13 +122,12 @@ export const insertOrAppendPlacementNode = (fiber: FiberNode, before: HTMLElemen
     const child = fiber.child;
     if (child) {
       insertOrAppendPlacementNode(child, before, parent);
-      // // FunctionComponent 可能返回一个数组，即有多个需要插入的节点
-      // // 所以还需要遍历其兄弟节点执行插入，如 Fragment（暂不支持）
-      // let sibling = child.sibling;
-      // while (sibling) {
-      //   insertOrAppendPlacementNode(sibling, before, parent);
-      //   sibling = sibling.sibling;
-      // }
+      // 还需要遍历其兄弟节点执行插入，如首次渲染，最外层是一个 Fragment
+      let sibling = child.sibling;
+      while (sibling) {
+        insertOrAppendPlacementNode(sibling, before, parent);
+        sibling = sibling.sibling;
+      }
     }
   }
 }

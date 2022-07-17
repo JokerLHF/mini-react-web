@@ -1,5 +1,6 @@
 import { ReactNode } from "@mini/react";
-import { FunctionComponent, ReactFiberTag } from "../interface/fiber";
+import { isObject } from "@mini/shared";
+import { FunctionComponent, ReactFiberTag, ReactFragmentProps, ReactNormalFiberProps } from "../interface/fiber";
 import { mountChildFibers, reconcileChildFibers } from "../ReactChildFiber";
 import { FiberNode } from "../ReactFiber";
 import { ReactExpirationTime } from "../ReactFiberExpirationTime/interface";
@@ -54,17 +55,16 @@ const updateHostRoot = (current: FiberNode, workInProgress: FiberNode, renderExp
   return workInProgress.child;
 }
 
-
 const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNode, renderExpirationTime: number) => {
   const nextProps = workInProgress.pendingProps;
 
-  // 排除掉 null 和 textContent 情况，hostComponent 的 props 只能是对象
-  if (!nextProps || typeof nextProps === 'string') {
+  // 排除掉 null 和 textContent, Fragment 情况，hostComponent 的 props 只能是对象
+  if (!isObject(nextProps)) {
     console.warn('updateHostComponent error happen');
     return null;
   }
 
-  let nextChildren = nextProps.children;
+  let nextChildren = (nextProps as ReactNormalFiberProps).children;
 
   markRef(current, workInProgress);
   reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);
@@ -97,6 +97,12 @@ const updateFunctionComponent = (current: FiberNode | null, workInProgress: Fibe
   }
 
   reconcileChildren(current, workInProgress, children, renderExpirationTime);
+  return workInProgress.child;
+}
+
+const updateFragment = (current: FiberNode | null, workInProgress: FiberNode, renderExpirationTime: number) => {
+  const nextChildren = workInProgress.pendingProps as ReactFragmentProps;
+  reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);
   return workInProgress.child;
 }
 
@@ -134,6 +140,8 @@ export const beginWork = (current: FiberNode | null, workInProgress: FiberNode):
       return updateHostComponent(current, workInProgress, renderExpirationTime);
     case ReactFiberTag.FunctionComponent:
       return updateFunctionComponent(current, workInProgress, renderExpirationTime);
+    case ReactFiberTag.Fragment:
+      return updateFragment(current, workInProgress, renderExpirationTime);
     case ReactFiberTag.HostText: // 文本节点不可能有子节点，直接返回null
     default:
       return null;
