@@ -1,3 +1,4 @@
+import { appendChild } from "@mini/react-dom";
 import { ReactFiberSideEffectTags, ReactFiberTag, ReactNormalFiberProps } from "../interface/fiber";
 import { FiberNode } from "../ReactFiber";
 import { diffProperties, setInitialDOMProperties } from "./diffProps";
@@ -21,7 +22,7 @@ export const appendAllChildren = (parent: HTMLElement, workInProgress: FiberNode
 
   while (node) {
     if (node.tag === ReactFiberTag.HostComponent || node.tag === ReactFiberTag.HostText) {
-      parent.appendChild(node.stateNode as HTMLElement | Text);
+      appendChild(parent, node.stateNode);
     } else if (node.child) {
       // 这里是考虑到组件的情况： 因为组件没有真实 dom 节点，需要跳过组件遍历其子节点
       node = node.child;

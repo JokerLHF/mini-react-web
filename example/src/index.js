@@ -3,7 +3,7 @@ import ReactDOM from '@mini/react-dom';
 
 // import LifeCycle from './components/lifeCycle';
 // import Bailout from './components/bailout';
-import FragmentCom from './components/FragmentCom';
+import FragmentCom from './components/fragmentCom';
 // import DiffPriority from './components/DiffPriority';
 // import SchedulerTask from './components/SchedulerTask';
 // import RenderToStringCom from './components/renderToString';
