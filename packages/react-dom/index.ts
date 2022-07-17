@@ -9,3 +9,4 @@ const ReactDOM = {
 export default ReactDOM;
 
 export * from './src/client/ReactRoot';
+export * from './src/client/ReactDOMHostConfig';

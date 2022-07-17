@@ -1,3 +1,4 @@
+import { appendChild, insertBefore } from "@mini/react-dom";
 import { ReactFiberSideEffectTags, ReactFiberTag } from "../../interface/fiber";
 import { FiberNode } from "../../ReactFiber";
 
@@ -113,9 +114,9 @@ export const insertOrAppendPlacementNode = (fiber: FiberNode, before: HTMLElemen
   if (tag === ReactFiberTag.HostComponent || tag === ReactFiberTag.HostText) {
     const stateNode = fiber.stateNode as HTMLElement | Text;
     if (before) {
-      parent.insertBefore(stateNode, before);
+      insertBefore(parent, stateNode, before);
     } else {
-      parent.appendChild(stateNode)
+      appendChild(parent, stateNode);
     }
   } else {
     // 当前fiber不是host类型，递归其子fiber, 如 com4
