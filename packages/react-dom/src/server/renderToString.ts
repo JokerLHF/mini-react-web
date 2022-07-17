@@ -29,7 +29,7 @@ const renderDOM = (child: ReactNode): Frame => {
   if (typeof type === 'function') {
     const content = handleNodeToString(type(props))
     frame.content = content;
-  } else {
+  } else if (typeof type === 'string'){ // 只处理 标签节点
     // 处理 props
     let propsStr = ''    
     Object.keys(props).forEach((key: string) => {
@@ -42,6 +42,8 @@ const renderDOM = (child: ReactNode): Frame => {
     frame.footer = `</${type}>`;
     
     frame.children = isArray(props.children) ? [...props.children] : [props.children];
+  } else {
+    // null Fragment 等处理逻辑
   }
 
   return frame;

@@ -23,6 +23,7 @@
 - [x] react 更新的一些优化路径（bailout）
 - [x] 基于 expirationTime 的 react concurrent 模式（简单的优先级插队以及饥饿现象）。lanes 模型的 concurrent 看不懂......
 - [x] 实现简单的 renderToString
+- [x] 实现 Fragment
 
 
 ## TODO

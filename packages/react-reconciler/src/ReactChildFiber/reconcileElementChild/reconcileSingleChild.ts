@@ -1,7 +1,9 @@
 import { deleteChild, deleteRemainingChildren } from "../helper/deleteChild";
 import { ReactElement } from "@mini/react";
-import { createFiberFromElement, FiberNode } from "../../ReactFiber";
+import { createFiberFromElement, createFiberFromFragment, FiberNode } from "../../ReactFiber";
 import { useFiberAsSingle } from "../helper/cloneChild";
+import { REACT_FRAGMENT_TYPE } from "@mini/shared";
+import { ReactFiberTag } from "../../interface/fiber";
 
 /**
  * - update阶段：遍历【旧节点】看【新节点】是否能复用（key相同，type相同），不能复用就标记删除
@@ -19,7 +21,8 @@ export const reconcileSingleElement = (returnFiber: FiberNode,  currentFirstChil
         // 在旧节点中找到了可以复用的 oldFiber，那么剩下其他 oldFiber 就应该被删掉
         deleteRemainingChildren(returnFiber, oldFiber.sibling);
         // 复用 oldFiber
-        const existing = useFiberAsSingle(oldFiber, element.props);
+        const props = oldFiber.tag === ReactFiberTag.Fragment ? element.props.children : element.props;
+        const existing = useFiberAsSingle(oldFiber, props);
         existing.return = returnFiber;
         return existing;
       } else {
@@ -50,7 +53,13 @@ export const reconcileSingleElement = (returnFiber: FiberNode,  currentFirstChil
   }
 
   // mount 阶段
-  const created = createFiberFromElement(element, renderExpirationTime);
+  let created: FiberNode | null = null;
+  if (element.type === REACT_FRAGMENT_TYPE) {
+    created = createFiberFromFragment(element.props.children, renderExpirationTime)
+  } else {
+    created = createFiberFromElement(element, renderExpirationTime);
+  }
+
   created.return = returnFiber;
   return created;
 }

@@ -1,12 +1,16 @@
-import { ReactElement, ReactNode } from "@mini/react";
-import { REACT_ELEMENT_TYPE, isObject, isText } from "@mini/shared";
-import { createFiberFromElement, createFiberFromText, FiberNode } from "../../ReactFiber";
+import { ReactElement, ReactFragment, ReactNode } from "@mini/react";
+import { REACT_ELEMENT_TYPE, isObject, isText, isArray } from "@mini/shared";
+import { createFiberFromElement, createFiberFromFragment, createFiberFromText, FiberNode } from "../../ReactFiber";
 
 export const createChild = (returnFiber: FiberNode, newChild: ReactNode, renderExpirationTime: number) => {
   if (isObject(newChild)) {
     return createElementFiber(returnFiber, newChild as ReactElement, renderExpirationTime);
   } else if (isText(newChild)) {
     const created = createFiberFromText(newChild as string, renderExpirationTime);
+    created.return = returnFiber;
+    return created;
+  } else if (isArray(newChild)) {
+    const created = createFiberFromFragment(newChild as ReactFragment, renderExpirationTime);
     created.return = returnFiber;
     return created;
   }

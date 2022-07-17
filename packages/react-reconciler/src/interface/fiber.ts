@@ -1,7 +1,8 @@
 import { ReactRoot } from "@mini/react-dom";
-import { ReactElementProps, ReactNode } from "@mini/react";
+import { ReactElementProps, ReactFragment, ReactNode } from "@mini/react";
 import { FiberNode } from "../ReactFiber";
 import { Hook, ReactHookEffect } from "./hook";
+import { REACT_FRAGMENT_TYPE } from '@mini/shared';
 
 export enum ReactFiberTag {
   // reactRoot
@@ -12,18 +13,23 @@ export enum ReactFiberTag {
   HostText = 3,
   // 函数组件
   FunctionComponent = 4,
+  // Fragment
+  Fragment = 5,
 }
 
 
 /**
  * 对于 FiberRoot 来说 props 是 null
  * 对于 textFiber 的 props 就是 string，也就是 textContent
+ * 对于 Fragment 来说 props 就是 children 节点
  * 其他有 props 的就是对象, 也就是 createElement 的 props
  */
 export type ReactTextFiberProps = string;
 export type ReactNormalFiberProps = Record<string, any>;
 export type ReactFiberRootProps = null;
-export type ReactFiberProps = ReactNormalFiberProps | ReactFiberRootProps | ReactTextFiberProps;
+export type ReactFragmentProps = ReactFragment;
+
+export type ReactFiberProps = ReactNormalFiberProps | ReactFiberRootProps | ReactTextFiberProps | ReactFragmentProps;
 
 export interface FunctionComponent {
 	(props?: ReactElementProps): ReactNode;
@@ -39,9 +45,10 @@ export type ReactFiberMemoizedState = Hook | Record<string, any> | null;
 /**
  * 1. 对于 HostComponent 指DOM节点 tagName
  * 2. 对于 FunctionComponent 指向整一个函数 fn
+ * 3. 对于 Fragment 来说就是一个标志
  * 3. 其他情况都是 null
  */
-export type ReactFiberType = string | FunctionComponent | null;
+export type ReactFiberType = string | FunctionComponent | typeof REACT_FRAGMENT_TYPE | null;
 
 
 /**
