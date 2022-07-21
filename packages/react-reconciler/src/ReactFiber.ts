@@ -1,5 +1,5 @@
 import { ReactElement, ReactElementKey, ReactElementRef, ReactFragment } from "@mini/react";
-import { REACT_FRAGMENT_TYPE } from "@mini/shared";
+import { isFunction, isObject, isString, REACT_FRAGMENT_TYPE, REACT_MEMO_TYPE } from "@mini/shared";
 import { ReactFiberMemoizedState, ReactFiberProps, ReactFiberSideEffectTags, ReactFiberStateNode, ReactFiberTag, ReactFiberType, ReactFiberUpdateQueue } from "./interface/fiber";
 import { ReactExpirationTime } from "./ReactFiberExpirationTime/interface";
 
@@ -133,17 +133,34 @@ export const createWorkInProgress = (current: FiberNode, pendingProps: ReactFibe
 
 export const createFiberFromElement = (element: ReactElement, renderExpirationTime: number) => {
   const { type, key, props } = element;
-  switch (type) {
+  let tag;
+  getTag: switch (type) {
     case REACT_FRAGMENT_TYPE:
       return createFiberFromFragment(element.props.children, renderExpirationTime);
-    default:
-      const tag = typeof type === 'function' ? ReactFiberTag.FunctionComponent : ReactFiberTag.HostComponent;
-      const fiber = new FiberNode(tag, props, key);
-      fiber.expirationTime = renderExpirationTime;
-      fiber.type = type;
-      fiber.ref = element.ref;
-      return fiber;
+    default: {
+      if (isFunction(type)) {
+        tag = ReactFiberTag.FunctionComponent;
+        break;
+      } else if (isString(type)) {
+        tag = ReactFiberTag.HostComponent;
+        break;
+      } else if (isObject(type)) {
+        // 目前只有 ReactMemo 就直接 any 了
+        switch ((type as any).$$typeof) {
+          case REACT_MEMO_TYPE:
+            tag = ReactFiberTag.MemoComponent;
+            break getTag;
+        }
+      }
+      throw Error('出错了')
+    }
   }
+
+  const fiber = new FiberNode(tag, props, key);
+  fiber.expirationTime = renderExpirationTime;
+  fiber.type = type;
+  fiber.ref = element.ref;
+  return fiber;
 }
 
 export const createFiberFromText = (textContent: string, renderExpirationTime: number) => {
