@@ -3,11 +3,11 @@ import ReactDOM from '@mini/react-dom';
 
 // import LifeCycle from './components/lifeCycle';
 // import Bailout from './components/bailout';
-import FragmentCom from './components/fragmentCom';
+// import FragmentCom from './components/fragmentCom';
 // import DiffPriority from './components/DiffPriority';
 // import SchedulerTask from './components/SchedulerTask';
 // import RenderToStringCom from './components/renderToString';
-
+import Memo from './components/memo';
 
 function App() {
   // 正常生命周期执行顺序
@@ -26,7 +26,10 @@ function App() {
   // return <RenderToStringCom />
 
   // Fragment
-  return <FragmentCom />
+  // return <FragmentCom />
+
+  // Memo
+  return <Memo />
 }
 
 ReactDOM.render(<App />, document.querySelector('#root'))

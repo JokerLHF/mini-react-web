@@ -1,5 +1,5 @@
-import { ReactNode } from "@mini/react";
-import { isObject } from "@mini/shared";
+import { ReactMemoElement, ReactNode } from "@mini/react";
+import shallowEqual from "@mini/shared/src/shallowEqual";
 import { FunctionComponent, ReactFiberTag, ReactFragmentProps, ReactNormalFiberProps } from "../interface/fiber";
 import { mountChildFibers, reconcileChildFibers } from "../ReactChildFiber";
 import { FiberNode } from "../ReactFiber";
@@ -56,14 +56,7 @@ const updateHostRoot = (current: FiberNode, workInProgress: FiberNode, renderExp
 }
 
 const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNode, renderExpirationTime: number) => {
-  const nextProps = workInProgress.pendingProps;
-
-  // 排除掉 null 和 textContent, Fragment 情况，hostComponent 的 props 只能是对象
-  if (!isObject(nextProps)) {
-    console.warn('updateHostComponent error happen');
-    return null;
-  }
-
+  const nextProps = workInProgress.pendingProps as ReactNormalFiberProps;
   let nextChildren = (nextProps as ReactNormalFiberProps).children;
 
   markRef(current, workInProgress);
@@ -74,16 +67,8 @@ const updateHostComponent = (current: FiberNode | null, workInProgress: FiberNod
 /**
  * 对于 FunctionComponent fiber 来说，需要执行获取 children
  */
-const updateFunctionComponent = (current: FiberNode | null, workInProgress: FiberNode, renderExpirationTime: number) => {
-  const { pendingProps, type } = workInProgress;
-
-  // 排除掉 null 和 textContent 情况，functionComponent 的 props 只能是对象
-  if (!pendingProps || typeof pendingProps === 'string') {
-    console.warn('updateFunctionComponent error happen');
-    return null;
-  }
-
-  const children = renderWithHooks(current, workInProgress, type as FunctionComponent, pendingProps);
+const updateFunctionComponent = (current: FiberNode | null, workInProgress: FiberNode, Component: FunctionComponent, nextProps: ReactNormalFiberProps, renderExpirationTime: number) => {
+  const children = renderWithHooks(current, workInProgress, Component, nextProps);
   /**
    * 性能优化路径：
    * 对于一个组件是否更新取决于两个：props 以及 state 是否都改变。
@@ -106,12 +91,28 @@ const updateFragment = (current: FiberNode | null, workInProgress: FiberNode, re
   return workInProgress.child;
 }
 
+const updateMemoComponent = (current: FiberNode | null, workInProgress: FiberNode, Component: ReactMemoElement, nextProps: ReactNormalFiberProps, renderExpirationTime: number) => {  
+  // update
+  if (current !== null) {
+    const oldProps = current.pendingProps as ReactNormalFiberProps;
+    const compare = Component.compare || shallowEqual;
+    if (compare(oldProps, nextProps)) {
+      setWorkInProgressDidUpdate(false);
+      return bailoutOnAlreadyFinishedWork(workInProgress, renderExpirationTime);
+    }
+  }
+
+  // mount
+  return updateFunctionComponent(current, workInProgress, Component.type, nextProps, renderExpirationTime);
+}
+
 /**
  * beginWork 的任务就是将 workInprogress 的子节点变为 fiber 节点。
  */
 export const beginWork = (current: FiberNode | null, workInProgress: FiberNode): FiberNode | null => {
   const updateExpirationTime = workInProgress.expirationTime;
   const renderExpirationTime = getRenderExpirationTime();
+  debugger
 
   // update时，可以复用current（即上一次更新的Fiber节点）
   if (current) {
@@ -138,10 +139,16 @@ export const beginWork = (current: FiberNode | null, workInProgress: FiberNode):
       return updateHostRoot(current!, workInProgress, renderExpirationTime);
     case ReactFiberTag.HostComponent:
       return updateHostComponent(current, workInProgress, renderExpirationTime);
-    case ReactFiberTag.FunctionComponent:
-      return updateFunctionComponent(current, workInProgress, renderExpirationTime);
+    case ReactFiberTag.FunctionComponent: {
+      const { pendingProps, type } = workInProgress;
+      return updateFunctionComponent(current, workInProgress, type as FunctionComponent, pendingProps as ReactNormalFiberProps, renderExpirationTime);
+    }
     case ReactFiberTag.Fragment:
       return updateFragment(current, workInProgress, renderExpirationTime);
+    case ReactFiberTag.MemoComponent: {  
+      const { pendingProps, type } = workInProgress;
+      return updateMemoComponent(current, workInProgress, type as ReactMemoElement, pendingProps as ReactNormalFiberProps, renderExpirationTime);
+    }
     case ReactFiberTag.HostText: // 文本节点不可能有子节点，直接返回null
     default:
       return null;
