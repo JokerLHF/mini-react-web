@@ -29,3 +29,7 @@ export const useCallback = (callback: ReactHookCallback, deps?: ReactHookCallbac
 export const useRef = <T>(initialValue: T) => {
   return ReactCurrentDispatcher.current!.useRef(initialValue);
 }
+
+export const useMemo = <T>(create: () => T, deps?: any[]) => {
+  return ReactCurrentDispatcher.current!.useMemo(create, deps);
+}

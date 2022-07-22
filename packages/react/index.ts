@@ -1,6 +1,6 @@
 import { REACT_FRAGMENT_TYPE } from '@mini/shared';
 import { createElement } from './src/ReactElement';
-import { useState, useEffect, useLayoutEffect, useCallback, useRef } from './src/ReactHook';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } from './src/ReactHook';
 import { memo } from './src/ReactMemo';
 
 const React = {
@@ -10,6 +10,7 @@ const React = {
   useLayoutEffect,
   useCallback,
   useRef,
+  useMemo,
   memo,
   Fragment: REACT_FRAGMENT_TYPE,
 }
