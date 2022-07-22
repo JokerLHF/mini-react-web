@@ -14,6 +14,10 @@ export type Dispatcher = {
     deps?: ReactHookCallbackDeps,
   ): void,
   useRef<T>(initialValue: T): ReactHookRef<T>,
+  useMemo<T>(
+    create: () => T,
+    deps?: any[],
+  ): T
 }
 
 /**
@@ -92,6 +96,13 @@ export type ReactHookCallbackDeps = any[] | null;
 export type ReactHookCallback = () => void;
 export type ReactHookCallbackMemorized = [ReactHookCallback, ReactHookCallbackDeps];
 
+/**
+ * useMemo
+ */
+ export type ReactHookUseMemoDeps = any[] | null;
+ export type ReactHookUseMemoCallback = () => void;
+ export type ReactHookUseMemoMemorized = [ReactHookUseMemoDeps, ReactHookUseMemoCallback];
+ 
 
 /**
  * const ref = useRef()

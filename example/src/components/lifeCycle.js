@@ -1,10 +1,16 @@
 import React from '@mini/react';
 
-const { useState, useEffect, useLayoutEffect, useCallback, useRef } = React;
+const { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } = React;
 
 function Children1() {
   return (
     <div>children1 </div>
+  )
+}
+
+function Children2(props) {
+  return (
+    <div>children2: {props.value} </div>
   )
 }
 
@@ -38,6 +44,10 @@ export default function LifeCycle() {
     console.log('num-click', num);
   }, [num]);
 
+  const val = useMemo(() => {
+    return <Children2 value={state} />
+  }, [state]);
+
   return (
     <div>
       <p>I am</p>
@@ -47,6 +57,12 @@ export default function LifeCycle() {
       <Children1 />
       <button onClick={handleAddState}  ref={currentRef}> 点我state + 1 </button>
       <button onClick={handleAddNum}> 点我num +1 </button>
+
+      <p>这是 state: {state}</p>
+      {/* <p>这是 useMemo: {val} </p> */}
+      {val}
+      <p>这是 num: {num} </p>
+
     </div>
   )
 }

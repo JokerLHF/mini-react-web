@@ -6,4 +6,7 @@ export const HooksDispatcher: Dispatcher = {
   useLayoutEffect: () => { },
   useCallback: () => { },
   useRef: (initialState) => { return { current: initialState } },
+  useMemo: (create, deps) => {  
+    return create();
+  },
 }

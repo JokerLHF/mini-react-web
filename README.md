@@ -16,14 +16,14 @@
 ## 已实现功能
 - [x] fiber 首屏渲染
 - [x] fiber 更新渲染
-- [x] hook 支持(useState, useEffect, useLayoutEffect, useRef, useCallback)
+- [x] hook 支持(useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo)
 - [x] key diff, 简单的 props diff
 - [x] 合成事件，react合成事件太复杂。所以自己实现了一个简单的合成事件(目前只支持了 onClick 事件)。参考了[这里](https://7kms.github.io/react-illustration-series/main/synthetic-event)
 - [x] scheduler 任务调度
 - [x] react 更新的一些优化路径（bailout）
 - [x] 基于 expirationTime 的 react concurrent 模式（简单的优先级插队以及饥饿现象）。lanes 模型的 concurrent 看不懂......
 - [x] 实现简单的 renderToString
-- [x] 实现 Fragment
+- [x] 实现 Fragment, React.memo
 
 
 ## TODO
@@ -32,8 +32,9 @@
 - [x] ~~react 更新的一些优化路径（bailout）~~
 - [x] ~~增加 concurrent 模式例子，验证代码是否存在 bug~~
 - [x] ~~引入 pnpm 替代 npm~~
+- [x] ~~完成 useMemo, memo 等API~~
 - [ ] 输出文章
-- [ ] 完成 useMemo, memo 等API
+- [ ] 使用 rollup 打包
 - [ ] 引入 eslint
 - [ ] 引入 单元测试
 

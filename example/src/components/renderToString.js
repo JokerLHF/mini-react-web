@@ -3,7 +3,7 @@ import ReactDOM from '@mini/react-dom';
 
 
 const { renderToString } = ReactDOM;
-const { useState } = React;
+const { useState, useMemo } = React;
 
 function Children2(props) {
   return (
@@ -16,8 +16,14 @@ function Children2(props) {
 
 function Children1() {
   const [state, setState] = useState(1);
+
+  const val = useMemo(() => {
+    return <Children2 />
+  }, [state]);
+
   return (
     <div a="1">
+      {val}
       children1
       <Children2>
         <div>1111</div>

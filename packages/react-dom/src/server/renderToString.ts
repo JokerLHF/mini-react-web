@@ -56,7 +56,7 @@ const handleNodeToString = (reactNode: ReactNode): string => {
   // 处理子节点
   const children  = frame.children || [];
   for (let i = 0; i < children.length; i++) {
-    frame.content += handleNodeToString(children[i]);
+    children[i] && (frame.content += handleNodeToString(children[i]));
   }
   
   return frame.content + frame.footer;
