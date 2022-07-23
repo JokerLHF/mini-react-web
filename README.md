@@ -2,10 +2,9 @@
 - 基于react 17 使用 ts 实现了一个 mini-react
 
 ## 使用
-- cd example
 - pnpm install
 - pnpm start
-- 源代码在 packages, 跑起来的实例在 example, 修改 index.js 即可
+- 源代码在 packages, 跑起来的实例在 example, 修改 example/index.js 即可
 
 ## 说明
 - 该仓库主要是实现一个 mini 版的 react，所以在整体流程和命名都会尽可能跟 react 保持一致。但是 react 一些函数实现会比较长，为了保持更好的阅读性，自己会去拆分函数，所以跟 react 对比可能会不一致。
