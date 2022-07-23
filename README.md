@@ -34,9 +34,9 @@
 - [x] ~~引入 pnpm 替代 npm~~
 - [x] ~~完成 useMemo, memo 等API~~
 - [x] ~~引入 eslint~~
+- [x] ~~引入 单元测试~~
 - [ ] 输出文章
 - [ ] 使用 rollup 打包
-- [ ] 引入 单元测试
 
 
 
