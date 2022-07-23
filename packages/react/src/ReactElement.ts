@@ -13,11 +13,11 @@ const createReactElement = (type: ReactElementType, key: ReactElementKey, ref: R
 
 const hasValidKey = (config: ReactElementProps) => {
 	return config.key !== undefined;
-}
+};
 
 const hasValidRef = (config: ReactElementProps) =>{
 	return config.ref !== undefined;
-}
+};
 
 /**
  * 注意：ReactElement 是有两个级别：

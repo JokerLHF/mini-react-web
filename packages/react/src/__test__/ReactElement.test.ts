@@ -2,12 +2,12 @@ import { FunctionComponent } from '@mini/react-reconciler';
 import { createElement } from '../ReactElement';
 
 describe('测试 ReactElement', () => {
-  let ComponentFC: FunctionComponent;
-  beforeAll(() => {
+	let ComponentFC: FunctionComponent;
+	beforeAll(() => {
 		ComponentFC = () => {
 			return createElement('div', null);
 		};
-  })
+	});
 
 	it('returns a complete element according to spec', () => {
 		const element = createElement(ComponentFC, null);
@@ -17,7 +17,7 @@ describe('测试 ReactElement', () => {
 		expect(element.props).toEqual({});
 	});
 
-  it('allows a string to be passed as the type', () => {
+	it('allows a string to be passed as the type', () => {
 		const element = createElement('div', null);
 		expect(element.type).toBe('div');
 		expect(element.key).toBe(null);
