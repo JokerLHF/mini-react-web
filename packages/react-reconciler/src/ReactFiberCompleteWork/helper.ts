@@ -1,5 +1,5 @@
-import { FiberNode } from "../ReactFiber";
-import { ReactExpirationTime } from "../ReactFiberExpirationTime/interface";
+import { FiberNode } from '../ReactFiber';
+import { ReactExpirationTime } from '../ReactFiberExpirationTime/interface';
 
 /**
  * 背景：
@@ -10,61 +10,61 @@ import { ReactExpirationTime } from "../ReactFiberExpirationTime/interface";
  * 注意这里是一个单项链表，firstEffect指向表头， lastEffect指向表尾
  */
 export const collectEffectListToParent = (returnFiber: FiberNode | null, workInProgress: FiberNode) => {
-  if (!returnFiber) {
-    return;
-  }
-  // 1. 将 workInProgress 的子节点的 effectList append 到 returnFiber 上
-  if (!returnFiber.firstEffect) {
-    returnFiber.firstEffect = workInProgress.firstEffect;
-  }
-  if (workInProgress.lastEffect) {
-    if (returnFiber.lastEffect) {
-      returnFiber.lastEffect.nextEffect = workInProgress.firstEffect;
-    }
-    returnFiber.lastEffect = workInProgress.lastEffect;
-  }
-  // 2.  将 workInProgress 本身的 append 到 returnFiber 上
-  const effectTag = workInProgress.effectTag;
-  if (effectTag) {
-    if (returnFiber.lastEffect) {
-      returnFiber.lastEffect.nextEffect = workInProgress;
-    } else {
-      returnFiber.firstEffect = workInProgress;
-    }
-    returnFiber.lastEffect = workInProgress;
-  }
-}
+	if (!returnFiber) {
+		return;
+	}
+	// 1. 将 workInProgress 的子节点的 effectList append 到 returnFiber 上
+	if (!returnFiber.firstEffect) {
+		returnFiber.firstEffect = workInProgress.firstEffect;
+	}
+	if (workInProgress.lastEffect) {
+		if (returnFiber.lastEffect) {
+			returnFiber.lastEffect.nextEffect = workInProgress.firstEffect;
+		}
+		returnFiber.lastEffect = workInProgress.lastEffect;
+	}
+	// 2.  将 workInProgress 本身的 append 到 returnFiber 上
+	const effectTag = workInProgress.effectTag;
+	if (effectTag) {
+		if (returnFiber.lastEffect) {
+			returnFiber.lastEffect.nextEffect = workInProgress;
+		} else {
+			returnFiber.firstEffect = workInProgress;
+		}
+		returnFiber.lastEffect = workInProgress;
+	}
+};
 
 export const createTextInstance = (text: string) => {
-  const textElement = document.createTextNode(text);
-  return textElement;
-}
+	const textElement = document.createTextNode(text);
+	return textElement;
+};
 
 export const createInstance = (type: string) => {
-  const domElement = document.createElement(type);
-  return domElement;
-}
+	const domElement = document.createElement(type);
+	return domElement;
+};
 
 const randomKey = Math.random().toString(36).slice(2);
 export const internalInstanceKey = '__reactFiber$' + randomKey;
 export function precacheFiberNode(fiber: FiberNode, node: HTMLElement | Text) {
-  (node as any)[internalInstanceKey] = fiber;
+	(node as any)[internalInstanceKey] = fiber;
 }
 
 
 export function resetChildExpirationTime(completedWork: FiberNode) {
-  let newChildExpirationTime = ReactExpirationTime.NoWork;
-  let child = completedWork.child;
+	let newChildExpirationTime = ReactExpirationTime.NoWork;
+	let child = completedWork.child;
 
-  while (child) {
-    const childUpdateExpirationTime = child.expirationTime;
-    const childChildExpirationTime = child.childExpirationTime;
+	while (child) {
+		const childUpdateExpirationTime = child.expirationTime;
+		const childChildExpirationTime = child.childExpirationTime;
 
-    // 比较所有子节点的 childUpdateExpirationTime childChildExpirationTime 最大值
-    const childMaxExpirationTime = Math.max(childUpdateExpirationTime, childChildExpirationTime);
-    newChildExpirationTime = Math.max(childMaxExpirationTime, newChildExpirationTime);
+		// 比较所有子节点的 childUpdateExpirationTime childChildExpirationTime 最大值
+		const childMaxExpirationTime = Math.max(childUpdateExpirationTime, childChildExpirationTime);
+		newChildExpirationTime = Math.max(childMaxExpirationTime, newChildExpirationTime);
 
-    child = child.sibling;
-  }
-  completedWork.childExpirationTime = newChildExpirationTime;
+		child = child.sibling;
+	}
+	completedWork.childExpirationTime = newChildExpirationTime;
 }

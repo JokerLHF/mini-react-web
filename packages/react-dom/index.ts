@@ -1,10 +1,10 @@
-import { render } from "./src/client";
-import { renderToString } from "./src/server/renderToString";
+import { render } from './src/client';
+import { renderToString } from './src/server/renderToString';
 
 const ReactDOM = {
-  render,
-  renderToString,
-}
+	render,
+	renderToString,
+};
 
 export default ReactDOM;
 

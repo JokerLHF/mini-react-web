@@ -5,16 +5,16 @@ import { getCurrentPriorityLevel, shouldYieldToHost } from './src/schedulerCallb
 import { FakeSchedulerSyncTask, flushSyncCallbackQueue, runWithPriority, scheduleSyncCallback } from './src/scheduleSyncCallback';
 
 export {
-  scheduleCallback,
-  cancelCallback,
-  getCurrentPriorityLevel,
-  shouldYieldToHost,
-  scheduleSyncCallback,
-  getCurrentTime,
-  runWithPriority,
-  SchedulerPriorityLevel,
-  flushSyncCallbackQueue,
-  SchedulerCallback,
-  SchedulerTask,
-  FakeSchedulerSyncTask,
-}
+	scheduleCallback,
+	cancelCallback,
+	getCurrentPriorityLevel,
+	shouldYieldToHost,
+	scheduleSyncCallback,
+	getCurrentTime,
+	runWithPriority,
+	SchedulerPriorityLevel,
+	flushSyncCallbackQueue,
+	SchedulerCallback,
+	SchedulerTask,
+	FakeSchedulerSyncTask,
+};

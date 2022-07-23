@@ -1,18 +1,18 @@
-import { ReactHookEffectFlags } from "../interface/hook";
-import { FiberNode } from "../ReactFiber";
-import { mountWorkInProgressHook, updateWorkInProgressHook } from "./index";
+import { ReactHookEffectFlags } from '../interface/hook';
+import { FiberNode } from '../ReactFiber';
+import { mountWorkInProgressHook, updateWorkInProgressHook } from './index';
 
 export const mountRef = <T>(initialValue: T) => {
-  const hook = mountWorkInProgressHook();
-  const ref = { current: initialValue };
-  hook.memoizedState = ref;
-  return ref;
-}
+	const hook = mountWorkInProgressHook();
+	const ref = { current: initialValue };
+	hook.memoizedState = ref;
+	return ref;
+};
 
 export const updateRef = <T>(initialValue: T) => {
-  var hook = updateWorkInProgressHook();
-  return hook.memoizedState;
-}
+	const hook = updateWorkInProgressHook();
+	return hook.memoizedState;
+};
 
 /**
  * ref 的写法只支持下面两种，其他写法不支持：
@@ -24,8 +24,8 @@ export const updateRef = <T>(initialValue: T) => {
  * currentRef.current = 111;
  */
 export const markRef = (current: FiberNode | null, workInProgress: FiberNode) => {
-  const ref = workInProgress.ref;
-  if (current === null && ref !== null) {
-    workInProgress.effectTag |= ReactHookEffectFlags.Ref;
-  }
-}
+	const ref = workInProgress.ref;
+	if (current === null && ref !== null) {
+		workInProgress.effectTag |= ReactHookEffectFlags.Ref;
+	}
+};

@@ -1,5 +1,5 @@
-import { FunctionComponent, ReactHookRef } from "@mini/react-reconciler";
-import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE, REACT_MEMO_TYPE } from "@mini/shared";
+import { FunctionComponent, ReactHookRef } from '@mini/react-reconciler';
+import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE, REACT_MEMO_TYPE } from '@mini/shared';
 
 /**
  * 标签类型

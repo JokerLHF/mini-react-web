@@ -1,5 +1,5 @@
-import { ReactRoot } from "@mini/react-dom";
-import { SchedulerPriorityLevel } from "@mini/scheduler";
+import { ReactRoot } from '@mini/react-dom';
+import { SchedulerPriorityLevel } from '@mini/scheduler';
 
 // 表示是否存在需要本次更新的 useEffect 列表, 
 let rootDoesHavePassiveEffects = false;
@@ -9,25 +9,25 @@ let rootWithPendingPassiveEffects: ReactRoot | null = null;
 let pendingPassiveEffectsRenderPriority = SchedulerPriorityLevel.NoSchedulerPriority;
 
 export const getRootDoesHavePassiveEffects = () => {
-  return rootDoesHavePassiveEffects;
-}
+	return rootDoesHavePassiveEffects;
+};
 
 export const setRootDoesHavePassiveEffects = (havePassiveEffects: boolean) => {
-  rootDoesHavePassiveEffects = havePassiveEffects;
-}
+	rootDoesHavePassiveEffects = havePassiveEffects;
+};
 
 export const getRootWithPendingPassiveEffects = () => {
-  return rootWithPendingPassiveEffects;
-}
+	return rootWithPendingPassiveEffects;
+};
 
 export const setRootWithPendingPassiveEffects = (pendingPassiveEffects: ReactRoot | null) => {
-  rootWithPendingPassiveEffects = pendingPassiveEffects;
-}
+	rootWithPendingPassiveEffects = pendingPassiveEffects;
+};
 
 export const getPendingPassiveEffectsRenderPriority = () => {
-  return pendingPassiveEffectsRenderPriority;
-}
+	return pendingPassiveEffectsRenderPriority;
+};
 
 export const setPendingPassiveEffectsRenderPriority = (priorityLevel: SchedulerPriorityLevel) => {
-  pendingPassiveEffectsRenderPriority = priorityLevel;
-}
+	pendingPassiveEffectsRenderPriority = priorityLevel;
+};

@@ -1,4 +1,4 @@
-import { ReactExpirationTime } from "./interface";
+import { ReactExpirationTime } from './interface';
 
 const UNIT_SIZE = 10;
 const MAGIC_NUMBER_OFFSET = ReactExpirationTime.Batched - 1;
@@ -6,12 +6,12 @@ const MAGIC_NUMBER_OFFSET = ReactExpirationTime.Batched - 1;
 // 10ms内产生的update有同样的过期时间，这样可以把多个update在一次处理
 // 越快过期的 expirationTime 越大
 export const msToExpirationTime = (ms: number) => {
-  return MAGIC_NUMBER_OFFSET - ((ms / UNIT_SIZE) | 0);
-}
+	return MAGIC_NUMBER_OFFSET - ((ms / UNIT_SIZE) | 0);
+};
 
 export const expirationTimeToMs = (expirationTime: number) => {
-  return (MAGIC_NUMBER_OFFSET - expirationTime) * UNIT_SIZE;
-}
+	return (MAGIC_NUMBER_OFFSET - expirationTime) * UNIT_SIZE;
+};
 
 /**
  * precision 一个步进值，间隔在 precision 内的2个数字会得到同样的结果
@@ -23,7 +23,7 @@ export const expirationTimeToMs = (expirationTime: number) => {
  * |0 相当于向下取整， +1 是为了使得最小结果是 precision，而不是 0
  */
 function ceiling(num: number, precision: number) {
-  return (((num / precision) | 0) + 1) * precision;
+	return (((num / precision) | 0) + 1) * precision;
 }
 
 /**
@@ -35,44 +35,44 @@ function ceiling(num: number, precision: number) {
  * 然后在一次更新中完成，相当于一个自动的 batchedUpdates。
  */
 function computeExpirationBucket(
-  currentExpirationTime: number,
-  addExpirationInMs: number,
-  bucketSizeMs: number,
+	currentExpirationTime: number,
+	addExpirationInMs: number,
+	bucketSizeMs: number,
 ) {
-  // 当前的 current 其实是一个经过 msToExpirationTime 的 过期时间：  MAGIC_NUMBER_OFFSET - ((ms / UNIT_SIZE) | 0);
-  // 所以其实 MAGIC_NUMBER_OFFSET - currentTime = ms / UNIT_SIZE。也就是 ms 是以 UNIT_SIZE 为单位的，相当于抹平了 10ms 的差距
-  // 所以 expirationInMs bucketSizeMs 都需要以 UNIT_SIZE 为单位去计算，相当于抹平了 10ms 的差距
-  // 所以最后计算的时候并不需要像 msToExpirationTime 一样再次去抹平 10ms 差距，因为再前面已经抹平了，直接 MAGIC_NUMBER_OFFSET 去减就可以
+	// 当前的 current 其实是一个经过 msToExpirationTime 的 过期时间：  MAGIC_NUMBER_OFFSET - ((ms / UNIT_SIZE) | 0);
+	// 所以其实 MAGIC_NUMBER_OFFSET - currentTime = ms / UNIT_SIZE。也就是 ms 是以 UNIT_SIZE 为单位的，相当于抹平了 10ms 的差距
+	// 所以 expirationInMs bucketSizeMs 都需要以 UNIT_SIZE 为单位去计算，相当于抹平了 10ms 的差距
+	// 所以最后计算的时候并不需要像 msToExpirationTime 一样再次去抹平 10ms 差距，因为再前面已经抹平了，直接 MAGIC_NUMBER_OFFSET 去减就可以
 
-  const currentExpirationTimeForUniSize = MAGIC_NUMBER_OFFSET - currentExpirationTime;
-  const addExpirationTimeForUniSize = addExpirationInMs / UNIT_SIZE;
-  const bucketSizeMsForUniSize = bucketSizeMs / UNIT_SIZE;
+	const currentExpirationTimeForUniSize = MAGIC_NUMBER_OFFSET - currentExpirationTime;
+	const addExpirationTimeForUniSize = addExpirationInMs / UNIT_SIZE;
+	const bucketSizeMsForUniSize = bucketSizeMs / UNIT_SIZE;
 
-  return (
-    MAGIC_NUMBER_OFFSET -
-    ceiling(
-      currentExpirationTimeForUniSize + addExpirationTimeForUniSize,
-      bucketSizeMsForUniSize,
-    )
-  );
+	return (
+		MAGIC_NUMBER_OFFSET -
+			ceiling(
+				currentExpirationTimeForUniSize + addExpirationTimeForUniSize,
+				bucketSizeMsForUniSize,
+			)
+	);
 }
 
 export const LOW_PRIORITY_EXPIRATION = 5000;
 export const LOW_PRIORITY_BATCH_SIZE = 250;
 export function computeAsyncExpiration(currentTime: number) {
-  return computeExpirationBucket(
-    currentTime,
-    LOW_PRIORITY_EXPIRATION,
-    LOW_PRIORITY_BATCH_SIZE,
-  );
+	return computeExpirationBucket(
+		currentTime,
+		LOW_PRIORITY_EXPIRATION,
+		LOW_PRIORITY_BATCH_SIZE,
+	);
 }
 
 export const HIGH_PRIORITY_EXPIRATION = 150;
 export const HIGH_PRIORITY_BATCH_SIZE = 100;
 export function computeUserBlockingExpiration(currentTime: number) {
-  return computeExpirationBucket(
-    currentTime,
-    HIGH_PRIORITY_EXPIRATION,
-    HIGH_PRIORITY_BATCH_SIZE,
-  );
+	return computeExpirationBucket(
+		currentTime,
+		HIGH_PRIORITY_EXPIRATION,
+		HIGH_PRIORITY_BATCH_SIZE,
+	);
 }
