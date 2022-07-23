@@ -43,7 +43,7 @@ const hasValidRef = (config: ReactElementProps) =>{
  *   }
  */
 export const createElement = (type: ReactElementType, config: ReactElementProps | null, ...children: ReactNode[]) => {
-	const props: ReactElementProps = {};
+	const props: ReactElementProps = config || {};
 	const length = children.length;
 	let ref = null;
 	let key = null;
