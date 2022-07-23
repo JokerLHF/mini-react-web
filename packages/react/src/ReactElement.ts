@@ -1,5 +1,5 @@
 import { REACT_ELEMENT_TYPE } from '@mini/shared';
-import { ReactElement, ReactElementKey, ReactElementProps, ReactElementType, ReactElementRef } from './interface';
+import { ReactElement, ReactElementKey, ReactElementProps, ReactElementType, ReactElementRef, ReactNode } from './interface';
 
 const createReactElement = (type: ReactElementType, key: ReactElementKey, ref: ReactElementRef, props: ReactElementProps): ReactElement => {
 	return {
@@ -9,6 +9,14 @@ const createReactElement = (type: ReactElementType, key: ReactElementKey, ref: R
 		props,
 		ref,
 	};
+};
+
+const hasValidKey = (config: ReactElementProps) => {
+	return config.key !== undefined;
+};
+
+const hasValidRef = (config: ReactElementProps) =>{
+	return config.ref !== undefined;
 };
 
 /**
@@ -34,10 +42,30 @@ const createReactElement = (type: ReactElementType, key: ReactElementKey, ref: R
  *     )
  *   }
  */
-export const createElement = (type: ReactElementType, config: ReactElementProps, ...children:  (ReactElement | string)[]) => {
-	const props: ReactElementProps = config || {};
+export const createElement = (type: ReactElementType, config: ReactElementProps | null, ...children: ReactNode[]) => {
+	const props: ReactElementProps = {};
 	const length = children.length;
-	const ref = props.ref || null;
+	let ref = null;
+	let key = null;
+
+	for (const prop in config) {
+		const val = config[prop];
+		if (prop === 'key') {
+			if (hasValidKey(config)) {
+				key = '' + val;
+			}
+			continue;
+		}
+		if (prop === 'ref' && val !== undefined) {
+			if (hasValidRef(config)) {
+				ref = val;
+			}
+			continue;
+		}
+		if ({}.hasOwnProperty.call(config, prop)) {
+			props[prop] = val;
+		}
+	}
 
 	// 多个children使用数组的形式, 没有 children 就没有 children 字段
 	if (length === 1) {
@@ -46,5 +74,5 @@ export const createElement = (type: ReactElementType, config: ReactElementProps,
 		props.children = children;
 	}
 
-	return createReactElement(type, null, ref, props);
+	return createReactElement(type, key, ref, props);
 };
