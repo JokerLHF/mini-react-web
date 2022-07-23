@@ -75,7 +75,7 @@ export enum ReactHookEffectFlags {
   Layout = 0b00000000000000100,    // useLayoutEffect 的标记
   Passive = 0b000000000000001000,   // useEffect 的标记
   Ref = 0b000000000000010000, // useRef 的标记
-};
+}
 
 export type ReactHookEffectCreate = () => ReactHookEffectDestroy;
 export type ReactHookEffectDestroy = (() => void) | void;
@@ -99,9 +99,9 @@ export type ReactHookCallbackMemorized = [ReactHookCallback, ReactHookCallbackDe
 /**
  * useMemo
  */
- export type ReactHookUseMemoDeps = any[] | null;
- export type ReactHookUseMemoCallback = () => void;
- export type ReactHookUseMemoMemorized = [ReactHookUseMemoDeps, ReactHookUseMemoCallback];
+export type ReactHookUseMemoDeps = any[] | null;
+export type ReactHookUseMemoCallback = () => void;
+export type ReactHookUseMemoMemorized = [ReactHookUseMemoDeps, ReactHookUseMemoCallback];
  
 
 /**

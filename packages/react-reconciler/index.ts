@@ -1,4 +1,4 @@
-export * from './src/interface/fiber'
+export * from './src/interface/fiber';
 export * from './src/interface/hook';
 export * from './src/ReactFiberExpirationTime/interface';
 export * from './src/ReactUpdateQueue';

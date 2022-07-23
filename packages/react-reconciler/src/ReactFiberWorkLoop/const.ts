@@ -1,34 +1,34 @@
-import { FiberNode } from "../ReactFiber";
-import { ReactContext } from "./interface";
+import { FiberNode } from '../ReactFiber';
+import { ReactContext } from './interface';
 
 // 描述我们在React执行上下文的位置
 // CommitContext 会在 commitRoot 有 effect时标记
 let executionContext = ReactContext.NoContext;
 // 正在进行render阶段的任务的renderExpirationTime
-let renderExpirationTime: number = 0;
+let renderExpirationTime = 0;
 // 正在执行的 fiber
 let workInProgress: FiberNode | null = null;
 
 export const getExecutionContext = () => {
-  return executionContext;
-}
+	return executionContext;
+};
 
 export const setExecutionContext = (newExecutionContext: ReactContext) => {
-  executionContext = newExecutionContext;
-}
+	executionContext = newExecutionContext;
+};
 
 export const getRenderExpirationTime = () => {
-  return renderExpirationTime;
-}
+	return renderExpirationTime;
+};
 
 export const setRenderExpirationTime = (newRenderExpirationTime: number) => {
-  renderExpirationTime = newRenderExpirationTime;
-}
+	renderExpirationTime = newRenderExpirationTime;
+};
 
 export const getWorkInProgress = () => {
-  return workInProgress;
-}
+	return workInProgress;
+};
 
 export const setWorkInProgress = (newWorkInProgress: FiberNode | null) => {
-  workInProgress = newWorkInProgress;
-}
+	workInProgress = newWorkInProgress;
+};

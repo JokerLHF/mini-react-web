@@ -3,9 +3,9 @@ let didReceiveUpdate = false;
 
 // 当hook 计算state发现state改变时通过该函数改变didReceiveUpdate
 export const setWorkInProgressDidUpdate = (didUpdate: boolean) => {
-  didReceiveUpdate = didUpdate;
-}
+	didReceiveUpdate = didUpdate;
+};
 
 export const getWorkInProgressDidUpdate = () => {
-  return didReceiveUpdate;
-}
+	return didReceiveUpdate;
+};

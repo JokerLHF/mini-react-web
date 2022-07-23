@@ -1,16 +1,16 @@
-import { computeAsyncExpiration, computeUserBlockingExpiration, expirationTimeToMs, HIGH_PRIORITY_BATCH_SIZE, HIGH_PRIORITY_EXPIRATION, LOW_PRIORITY_BATCH_SIZE, LOW_PRIORITY_EXPIRATION, msToExpirationTime } from "./index";
-import { getCurrentPriorityLevel, getCurrentTime, SchedulerPriorityLevel } from "@mini/scheduler";
-import { ReactExpirationTime } from "./interface";
-import { getExecutionContext, getRenderExpirationTime } from "../ReactFiberWorkLoop/const";
-import { ReactContext } from "../ReactFiberWorkLoop/interface";
+import { computeAsyncExpiration, computeUserBlockingExpiration, expirationTimeToMs, HIGH_PRIORITY_BATCH_SIZE, HIGH_PRIORITY_EXPIRATION, LOW_PRIORITY_BATCH_SIZE, LOW_PRIORITY_EXPIRATION, msToExpirationTime } from './index';
+import { getCurrentPriorityLevel, getCurrentTime, SchedulerPriorityLevel } from '@mini/scheduler';
+import { ReactExpirationTime } from './interface';
+import { getExecutionContext, getRenderExpirationTime } from '../ReactFiberWorkLoop/const';
+import { ReactContext } from '../ReactFiberWorkLoop/interface';
 
 let currentEventTime = ReactExpirationTime.NoWork;
 export const setCurrentEventTime = (time: number) => {
-  currentEventTime = time;
-}
+	currentEventTime = time;
+};
 export const getCurrentEventTime = () => {
-  return currentEventTime;
-}
+	return currentEventTime;
+};
 
 /**
  * 为什么在 render 或者 commit 阶段需要返回不同的 expirationTime 呢？
@@ -30,12 +30,12 @@ export const getCurrentEventTime = () => {
  *   1. 在 render 中，类似 class 的 render 中 setState。 直接死循环了.......  
  */
 export function requestCurrentTimeForUpdate() {
-  // 当前处于 在react work 中（render 或 commit），返回真实时间
-  if ((getExecutionContext() & (ReactContext.RenderContext | ReactContext.CommitContext)) !== ReactContext.NoContext) {
-    return msToExpirationTime(getCurrentTime());
-  }
+	// 当前处于 在react work 中（render 或 commit），返回真实时间
+	if ((getExecutionContext() & (ReactContext.RenderContext | ReactContext.CommitContext)) !== ReactContext.NoContext) {
+		return msToExpirationTime(getCurrentTime());
+	}
 
-  /**
+	/**
    * 为什么 currentEventTime 需要被复用呢？
    * 我们没有处在react的work流程中（render 或 commit）
    * 当前可能处于事件产生的schedule阶段，比如 onClick回调造成的update。或者 useEffect dispatchAction造成的update
@@ -43,47 +43,47 @@ export function requestCurrentTimeForUpdate() {
    * 在此之前，从产生update到performConcurrentWorkOnRoot之间这段时间， 也就是 pre-render 阶段
    * 如果同一个事件产生了多个update，（比如 useState调用2次），那么他们会共用一个当前时间。
    */
-  if (currentEventTime !== ReactExpirationTime.NoWork) {
-    return currentEventTime;
-  }
-  // 这是react被scheduler中断后产生的第一个update，计算一个时间
-  currentEventTime = msToExpirationTime(getCurrentTime());
-  return currentEventTime;
+	if (currentEventTime !== ReactExpirationTime.NoWork) {
+		return currentEventTime;
+	}
+	// 这是react被scheduler中断后产生的第一个update，计算一个时间
+	currentEventTime = msToExpirationTime(getCurrentTime());
+	return currentEventTime;
 }
 
 /**
  * 根据 priority 计算不同的 expirationTime
  */
 export function computeExpirationForFiber(currentTime: number) {
-  const priorityLevel = getCurrentPriorityLevel();
+	const priorityLevel = getCurrentPriorityLevel();
   
-  // 如果正处于render阶段，返回本次render的expirationTime
-  if ((getExecutionContext() & ReactContext.RenderContext) !== ReactContext.NoContext) {
-    return getRenderExpirationTime();
-  }
+	// 如果正处于render阶段，返回本次render的expirationTime
+	if ((getExecutionContext() & ReactContext.RenderContext) !== ReactContext.NoContext) {
+		return getRenderExpirationTime();
+	}
 
-  let expirationTime;
-  // 根据Scheduler priority计算过期时间
-  // 对这几种priority的解释见 Scheduler模块下的runWithPriority
-  switch (priorityLevel) {
-    case SchedulerPriorityLevel.ImmediateSchedulerPriority:
-      expirationTime = ReactExpirationTime.Sync;
-      break;
-    case SchedulerPriorityLevel.UserBlockingSchedulerPriority:
-      expirationTime = computeUserBlockingExpiration(currentTime);
-      break;
-    case SchedulerPriorityLevel.NormalSchedulerPriority:
-    case SchedulerPriorityLevel.LowSchedulerPriority: 
-      expirationTime = computeAsyncExpiration(currentTime);
-      break;
-    case SchedulerPriorityLevel.IdleSchedulerPriority:
-      expirationTime = ReactExpirationTime.Idle;
-      break;
-    default:
-      throw Error("Expected a valid priority level");
-  }
+	let expirationTime;
+	// 根据Scheduler priority计算过期时间
+	// 对这几种priority的解释见 Scheduler模块下的runWithPriority
+	switch (priorityLevel) {
+	case SchedulerPriorityLevel.ImmediateSchedulerPriority:
+		expirationTime = ReactExpirationTime.Sync;
+		break;
+	case SchedulerPriorityLevel.UserBlockingSchedulerPriority:
+		expirationTime = computeUserBlockingExpiration(currentTime);
+		break;
+	case SchedulerPriorityLevel.NormalSchedulerPriority:
+	case SchedulerPriorityLevel.LowSchedulerPriority: 
+		expirationTime = computeAsyncExpiration(currentTime);
+		break;
+	case SchedulerPriorityLevel.IdleSchedulerPriority:
+		expirationTime = ReactExpirationTime.Idle;
+		break;
+	default:
+		throw Error('Expected a valid priority level');
+	}
 
-  return expirationTime;
+	return expirationTime;
 }
 
 
@@ -107,25 +107,25 @@ export function computeExpirationForFiber(currentTime: number) {
  */
 // 从expirationTime中推断优先级
 export function inferPriorityFromExpirationTime(currentTime: number, expirationTime: number) {
-  if (expirationTime === ReactExpirationTime.Sync) {
-    return SchedulerPriorityLevel.ImmediateSchedulerPriority;
-  }
-  if (expirationTime === ReactExpirationTime.Never || expirationTime === ReactExpirationTime.Idle) {
-    return SchedulerPriorityLevel.IdleSchedulerPriority;
-  }
+	if (expirationTime === ReactExpirationTime.Sync) {
+		return SchedulerPriorityLevel.ImmediateSchedulerPriority;
+	}
+	if (expirationTime === ReactExpirationTime.Never || expirationTime === ReactExpirationTime.Idle) {
+		return SchedulerPriorityLevel.IdleSchedulerPriority;
+	}
 
-  const msUntil = expirationTimeToMs(expirationTime) - expirationTimeToMs(currentTime);
-  if (msUntil <= 0) {
-    return SchedulerPriorityLevel.ImmediateSchedulerPriority;
-  }
-  if (msUntil <= HIGH_PRIORITY_EXPIRATION + HIGH_PRIORITY_BATCH_SIZE) {
-    return SchedulerPriorityLevel.UserBlockingSchedulerPriority;
-  }
-  if (msUntil <= LOW_PRIORITY_EXPIRATION + LOW_PRIORITY_BATCH_SIZE) {
-    return SchedulerPriorityLevel.NormalSchedulerPriority;
-  }
+	const msUntil = expirationTimeToMs(expirationTime) - expirationTimeToMs(currentTime);
+	if (msUntil <= 0) {
+		return SchedulerPriorityLevel.ImmediateSchedulerPriority;
+	}
+	if (msUntil <= HIGH_PRIORITY_EXPIRATION + HIGH_PRIORITY_BATCH_SIZE) {
+		return SchedulerPriorityLevel.UserBlockingSchedulerPriority;
+	}
+	if (msUntil <= LOW_PRIORITY_EXPIRATION + LOW_PRIORITY_BATCH_SIZE) {
+		return SchedulerPriorityLevel.NormalSchedulerPriority;
+	}
 
-  return SchedulerPriorityLevel.IdleSchedulerPriority;
+	return SchedulerPriorityLevel.IdleSchedulerPriority;
 }
 
 /**

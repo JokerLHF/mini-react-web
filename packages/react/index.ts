@@ -4,16 +4,16 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } fr
 import { memo } from './src/ReactMemo';
 
 const React = {
-  createElement,
-  useState,
-  useEffect,
-  useLayoutEffect,
-  useCallback,
-  useRef,
-  useMemo,
-  memo,
-  Fragment: REACT_FRAGMENT_TYPE,
-}
+	createElement,
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+	useRef,
+	useMemo,
+	memo,
+	Fragment: REACT_FRAGMENT_TYPE,
+};
 
 export default React;
 export * from './src/interface';

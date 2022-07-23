@@ -1,7 +1,7 @@
-import { ReactRoot } from "@mini/react-dom";
-import { ReactElementProps, ReactFragment, ReactMemoElement, ReactNode } from "@mini/react";
-import { FiberNode } from "../ReactFiber";
-import { Hook, ReactHookEffect } from "./hook";
+import { ReactRoot } from '@mini/react-dom';
+import { ReactElementProps, ReactFragment, ReactMemoElement, ReactNode } from '@mini/react';
+import { FiberNode } from '../ReactFiber';
+import { Hook, ReactHookEffect } from './hook';
 import { REACT_FRAGMENT_TYPE } from '@mini/shared';
 
 export enum ReactFiberTag {

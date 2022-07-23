@@ -1,32 +1,32 @@
-import { ReactElement, ReactNode } from "@mini/react";
-import { isArray, isObject, isText } from "@mini/shared";
-import { FiberNode } from "../ReactFiber";
-import { reconcileChildrenArray } from "./reconcileArrayChildren";
-import { reconcileSingleElementChild } from "./reconcileElementChild";
-import { reconcileSingleTextChild } from "./reconcileTextChild";
+import { ReactElement, ReactNode } from '@mini/react';
+import { isArray, isObject, isText } from '@mini/shared';
+import { FiberNode } from '../ReactFiber';
+import { reconcileChildrenArray } from './reconcileArrayChildren';
+import { reconcileSingleElementChild } from './reconcileElementChild';
+import { reconcileSingleTextChild } from './reconcileTextChild';
 
 let isTrackSideEffects = true;
 export const shouldTrackSideEffects = () => {
-  return isTrackSideEffects;
-}
+	return isTrackSideEffects;
+};
 
 const ChildReconciler = (trackSideEffects: boolean) => {
-  /**
+	/**
    * 根据 newChild 的类型生成对于的 fiber 节点, 对于 null 或者 undefined 直接返回 null，不渲染成 fiber 节点
    */
-  const reconcileChildFibers = (returnFiber: FiberNode, currentFirstChild: FiberNode | null, newChild: ReactNode, renderExpirationTime: number): FiberNode | null => {
-    isTrackSideEffects = trackSideEffects;
-    if (isObject(newChild)) {
-      return reconcileSingleElementChild(returnFiber, currentFirstChild, newChild as ReactElement, renderExpirationTime)
-    } else if (isArray(newChild)) {
-      return reconcileChildrenArray(returnFiber, currentFirstChild, newChild as ReactNode[], renderExpirationTime);
-    } else if (isText(newChild)) {
-      return reconcileSingleTextChild(returnFiber, currentFirstChild, `${newChild}` as string, renderExpirationTime);
-    }
-    return null;
-  }
-  return reconcileChildFibers;
-}
+	const reconcileChildFibers = (returnFiber: FiberNode, currentFirstChild: FiberNode | null, newChild: ReactNode, renderExpirationTime: number): FiberNode | null => {
+		isTrackSideEffects = trackSideEffects;
+		if (isObject(newChild)) {
+			return reconcileSingleElementChild(returnFiber, currentFirstChild, newChild as ReactElement, renderExpirationTime);
+		} else if (isArray(newChild)) {
+			return reconcileChildrenArray(returnFiber, currentFirstChild, newChild as ReactNode[], renderExpirationTime);
+		} else if (isText(newChild)) {
+			return reconcileSingleTextChild(returnFiber, currentFirstChild, `${newChild}` as string, renderExpirationTime);
+		}
+		return null;
+	};
+	return reconcileChildFibers;
+};
 
 export const mountChildFibers = ChildReconciler(false);
 export const reconcileChildFibers = ChildReconciler(true);

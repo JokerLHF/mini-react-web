@@ -3,20 +3,19 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = {
-  devtool: '#cheap-module-eval-source-map',
+  devtool: false,
 
   mode: 'development',
 
   target: 'web',
 
   entry: {
-    main: path.resolve(__dirname, './src/index.js'),
+    main: path.resolve(__dirname, './example/src/index.js'),
   },
 
   devServer: {
     host: 'localhost',
     port: 9999,
-    hot: true,
   },
 
   resolve: {
@@ -31,6 +30,7 @@ module.exports = {
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-env'],
+          plugins: ['@babel/plugin-transform-react-jsx'],
         }
       },
       {
@@ -48,7 +48,7 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, './assets/index.html')
+      template: path.resolve(__dirname, './example/assets/index.html')
     })
   ]
 }

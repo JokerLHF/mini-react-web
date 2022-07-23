@@ -33,9 +33,9 @@
 - [x] ~~增加 concurrent 模式例子，验证代码是否存在 bug~~
 - [x] ~~引入 pnpm 替代 npm~~
 - [x] ~~完成 useMemo, memo 等API~~
+- [x] ~~引入 eslint~~
 - [ ] 输出文章
 - [ ] 使用 rollup 打包
-- [ ] 引入 eslint
 - [ ] 引入 单元测试
 
 
@@ -47,7 +47,12 @@
  
  
 ## 参考资料
+### react 
 - [卡颂 react 技术揭秘](https://react.iamkasong.com/)
 - [图解react](https://7kms.github.io/react-illustration-series/)
 - [react工作原理](https://pomb.us/build-your-own-react/)
 - [react系列文章（强烈推荐）](https://segmentfault.com/blog/react-secret)
+### 前端工具
+- [husky](https://typicode.github.io/husky/#/)
+- [git hooks 钩子](https://git-scm.com/book/zh/v2/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-Git-%E9%92%A9%E5%AD%90)
+- [eslint 规则](https://cn.eslint.org/docs/user-guide/getting-started)

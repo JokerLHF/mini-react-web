@@ -1,17 +1,17 @@
-import { shouldTrackSideEffects } from "../index";
-import { ReactFiberSideEffectTags } from "../../interface/fiber";
-import { FiberNode } from "../../ReactFiber";
+import { shouldTrackSideEffects } from '../index';
+import { ReactFiberSideEffectTags } from '../../interface/fiber';
+import { FiberNode } from '../../ReactFiber';
 
 /**
  * fiber 标记 effectTag，表示需要在commit阶段插入DOM
  */
 export const placeSingleChild = (fiber: FiberNode) => {
-  // alternate存在表示该fiber已经插入到DOM
-  if (shouldTrackSideEffects() && !fiber.alternate) {
-    fiber.effectTag |= ReactFiberSideEffectTags.Placement;
-  }
-  return fiber;
-}
+	// alternate存在表示该fiber已经插入到DOM
+	if (shouldTrackSideEffects() && !fiber.alternate) {
+		fiber.effectTag |= ReactFiberSideEffectTags.Placement;
+	}
+	return fiber;
+};
 
 /**
  * 1. 如果 newFiber 是新建的 fiber 节点。做上插入的标记
@@ -27,21 +27,21 @@ export const placeSingleChild = (fiber: FiberNode) => {
  *     - 所以虽然复用了 fiber，但是此时 A 的 dom 结构是在 C 左边的，所以需要标记需要移动。在 commitWork 的时候再移动到 C 右边
  */
 export const placeChild = (newFiber: FiberNode, lastPlacedIndex: number) => {
-  if (!shouldTrackSideEffects()) {
-    return lastPlacedIndex;
-  }
-  // 如果 newFiber 是复用的话，就会存在 alternate。但是如果是新建的话就没有 alternate
-  const current = newFiber.alternate;
-  if (current) {
-    const oldIndex = current.index;
-    if (lastPlacedIndex > oldIndex) {
-      newFiber.effectTag |= ReactFiberSideEffectTags.Placement;
-      return lastPlacedIndex;
-    } else {
-      return oldIndex;
-    }
-  } else {
-    newFiber.effectTag |= ReactFiberSideEffectTags.Placement;
-    return lastPlacedIndex;
-  }
-}
+	if (!shouldTrackSideEffects()) {
+		return lastPlacedIndex;
+	}
+	// 如果 newFiber 是复用的话，就会存在 alternate。但是如果是新建的话就没有 alternate
+	const current = newFiber.alternate;
+	if (current) {
+		const oldIndex = current.index;
+		if (lastPlacedIndex > oldIndex) {
+			newFiber.effectTag |= ReactFiberSideEffectTags.Placement;
+			return lastPlacedIndex;
+		} else {
+			return oldIndex;
+		}
+	} else {
+		newFiber.effectTag |= ReactFiberSideEffectTags.Placement;
+		return lastPlacedIndex;
+	}
+};
