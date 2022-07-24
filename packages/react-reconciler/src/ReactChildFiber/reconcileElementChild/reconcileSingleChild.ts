@@ -1,9 +1,10 @@
 import { deleteChild, deleteRemainingChildren } from '../helper/deleteChild';
 import { ReactElement } from '@mini/react';
-import { createFiberFromElement, createFiberFromFragment, FiberNode } from '../../ReactFiber';
+import { FiberNode } from '../../ReactFiber';
 import { useFiberAsSingle } from '../helper/cloneChild';
 import { REACT_FRAGMENT_TYPE } from '@mini/shared';
 import { ReactFiberTag } from '../../interface/fiber';
+import { createFiberFromElement, createFiberFromFragment } from '../helper/createChild';
 
 /**
  * - update阶段：遍历【旧节点】看【新节点】是否能复用（key相同，type相同），不能复用就标记删除

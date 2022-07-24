@@ -1,6 +1,7 @@
 import { ReactRoot } from '@mini/react-dom';
 import { SchedulerPriorityLevel, cancelCallback, getCurrentTime, scheduleCallback, scheduleSyncCallback } from '@mini/scheduler';
-import { createWorkInProgress, FiberNode } from '../ReactFiber';
+import { createWorkInProgress } from '../ReactChildFiber/helper/cloneChild';
+import { FiberNode } from '../ReactFiber';
 import { beginWork } from '../ReactFiberBeginWork';
 import { completeUnitOfWork } from '../ReactFiberCompleteWork';
 import { expirationTimeToMs } from '../ReactFiberExpirationTime';

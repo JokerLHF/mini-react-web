@@ -1,6 +1,7 @@
 import { ReactFiberTag } from '../../interface/fiber';
-import { createFiberFromText, FiberNode } from '../../ReactFiber';
+import { FiberNode } from '../../ReactFiber';
 import { useFiberAsSingle } from '../helper/cloneChild';
+import { createFiberFromText } from '../helper/createChild';
 import { deleteRemainingChildren } from '../helper/deleteChild';
 import { placeSingleChild } from '../helper/placeChild';
 
