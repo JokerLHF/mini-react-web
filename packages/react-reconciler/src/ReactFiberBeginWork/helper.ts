@@ -1,5 +1,6 @@
 import { ReactFiberSideEffectTags } from '../interface/fiber';
-import { cloneChildFibers, FiberNode } from '../ReactFiber';
+import { cloneChildFibers } from '../ReactChildFiber/helper/cloneChild';
+import { FiberNode } from '../ReactFiber';
 import { ReactExpirationTime } from '../ReactFiberExpirationTime/interface';
 
 export const bailoutOnAlreadyFinishedWork = (workInProgress: FiberNode, renderExpirationTime: number) => {
