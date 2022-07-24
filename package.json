@@ -7,6 +7,7 @@
     "lint": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages",
     "start": "webpack-dev-server --config ./webpack.dev.config.js --color --open",
     "commit-msg": "node ./git-hooks/verifyCommit.js",
+    "pre-commit": "lint-staged",
     "test": "jest",
     "test-debuger": "node --inspect node_modules/jest/bin/jest.js --runInBand"
   },
@@ -17,6 +18,7 @@
     "@babel/core": "^7.18.9",
     "@babel/plugin-transform-react-jsx": "^7.17.3",
     "@babel/preset-env": "^7.4.2",
+    "@types/jest": "^28.1.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
     "babel-loader": "^8.0.5",
@@ -25,14 +27,20 @@
     "eslint": "^8.20.0",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.1",
+    "jest": "^28.1.3",
+    "lint-staged": "^13.0.3",
     "style-loader": "^2.0.0",
+    "ts-jest": "^28.0.7",
     "ts-loader": "^8.1.0",
     "typescript": "^4.2.4",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.9.3",
-    "@types/jest": "^28.1.6",
-    "jest": "^28.1.3",
-    "ts-jest": "^28.0.7"
+    "webpack-dev-server": "^4.9.3"
+  },
+  "lint-staged": {
+    "packages/**/*.{js,ts,tsx,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
