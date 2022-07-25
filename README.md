@@ -41,8 +41,10 @@
 
 ## 学习笔记（持续更新中...）
  - [前言: 了解 react 设计](https://n1pwb3impj.feishu.cn/docx/doxcnF7jdtVE0RJZMGZmK8W2Udf)
- - [了解 react 执行流程](https://n1pwb3impj.feishu.cn/docx/doxcnvaKnQyLHOc09KkY9tt43fh)
- - [了解 react diff 算法](https://n1pwb3impj.feishu.cn/docx/doxcn6NKeR8B3YU70oNLPiG8fme)
+ - [react 执行流程](https://n1pwb3impj.feishu.cn/docx/doxcnvaKnQyLHOc09KkY9tt43fh)
+ - [react 执行流程之 beginwork](https://n1pwb3impj.feishu.cn/docx/doxcnA83vKY27sDgYhSxqnFqKeC)
+ - [react 执行流程之 diff](https://n1pwb3impj.feishu.cn/docx/doxcn6NKeR8B3YU70oNLPiG8fme)
+ - [react 执行流程之 competeWork](https://n1pwb3impj.feishu.cn/docx/doxcnYE4o2jVLtGd1JlrwaH24Se)
  
  
 ## 参考资料
